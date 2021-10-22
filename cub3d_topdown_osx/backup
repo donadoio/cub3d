@@ -1,0 +1,49 @@
+void	draw_wall(t_data *data, int x, int y, int sq)
+{
+	int x1;
+	int y1;
+
+	x1 = x * sq;
+	y1 = y * sq;
+	x = x1 - sq;
+	y = y1 - sq;
+	while (x <= x1)
+	{
+		y = y1 - sq;
+		while (y <= y1)
+		{
+			my_mlx_pixel_put(data->img, x, y, 0x00FFFFFF);
+			y++;
+		}
+		x++;
+	}
+	return ;
+}
+
+void	draw_map(t_data *data, int	**worldmap)
+{
+	int	sq_width;
+	int	sq_height;
+	int	x;
+	int	y;
+
+	sq_width = 800 / 24;
+	sq_height = 800 / 24;
+	x = 0;
+	(void)worldmap;
+	while (x <= 24)
+	{
+		y = 0;
+		while (y < 24)
+		{
+			if (worldmap[y][x] == 1)
+			{
+				draw_wall(data, x + 1, y + 1, sq_height);
+			}
+			//if (x == 0 || y == 0 || x == 799 || y == 799 || (y % sq_height  == 0) || (x % sq_width  == 0))
+			//	my_mlx_pixel_put(data->img, x, y, 0x00F1F1F1);
+			y++;
+		}
+		x++;
+	}
+}

@@ -1,6 +1,9 @@
 NAME = cub3d
 
 SRC =	main.c\
+		console.c\
+		graphics.c\
+		topdown.c
 
 SRC_MAP = srcs/
 
