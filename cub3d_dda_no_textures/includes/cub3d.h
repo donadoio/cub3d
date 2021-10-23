@@ -6,17 +6,19 @@
 /*   By: idonado <idonado@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/08/21 18:38:26 by idonado       #+#    #+#                 */
-/*   Updated: 2021/10/23 18:26:43 by idonado       ########   odam.nl         */
+/*   Updated: 2021/10/23 18:47:13 by idonado       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CUB3D_H
 # define CUB3D_H
-# define WINWIDTH 640
-# define WINHEIGHT 480
+# define WINWIDTH 1020
+# define WINHEIGHT 748
 # define MAPLENGTH 24
 # define mapWidth 24
 # define mapHeight 24
+# define ROTATE_SPEED 0.04
+# define MOVE_SPEED 0.14
 # define PI 3.1415926435
 # include <unistd.h>
 # include <stdio.h>
@@ -66,6 +68,8 @@ typedef struct s_data
 	//used for fps (?)
 	double	time;
 	double	old_time;
+	double	move_speed;
+	double	rot_speed;
 }				t_data;
 
 //console stuff

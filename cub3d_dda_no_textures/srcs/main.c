@@ -6,7 +6,7 @@
 /*   By: idonado <idonado@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/08/21 19:12:50 by idonado       #+#    #+#                 */
-/*   Updated: 2021/10/23 18:24:41 by idonado       ########   odam.nl         */
+/*   Updated: 2021/10/23 19:50:18 by idonado       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@ int	keypressed(int keycode, t_data	*data)
 	clear_screen(data);
 	if (keycode == UP_KEY)
 	{
-		if(data->map[(int)(data->pos_x + data->dir_x * 0.1)][(int)(data->pos_y)] == 0) data->pos_x += data->dir_x * 0.1;
-    	if(data->map[(int)(data->pos_x)][(int)(data->pos_y + data->dir_y * 0.1)] == 0) data->pos_y += data->dir_y * 0.1;
+		if(data->map[(int)(data->pos_x + data->dir_x * MOVE_SPEED)][(int)(data->pos_y)] == 0) data->pos_x += data->dir_x * MOVE_SPEED;
+    	if(data->map[(int)(data->pos_x)][(int)(data->pos_y + data->dir_y * MOVE_SPEED)] == 0) data->pos_y += data->dir_y * MOVE_SPEED;
 		printf("UP\n");
 	}
 	else if (keycode == DOWN_KEY)
@@ -41,11 +41,11 @@ int	keypressed(int keycode, t_data	*data)
 	{
 		//both camera direction and camera plane must be rotated
     	old_dir_x = data->dir_x;
-    	data->dir_x = data->dir_x * cos(0.1) - data->dir_y * sin(0.1);
-    	data->dir_y = old_dir_x * sin(0.1) + data->dir_y * cos(0.1);
+    	data->dir_x = data->dir_x * cos(ROTATE_SPEED) - data->dir_y * sin(ROTATE_SPEED);
+    	data->dir_y = old_dir_x * sin(ROTATE_SPEED) + data->dir_y * cos(ROTATE_SPEED);
     	old_plane_x = data->plane_x;
-    	data->plane_x = data->plane_x * cos(0.1) - data->plane_y * sin(0.1);
-    	data->plane_y = old_plane_x * sin(0.1) + data->plane_y * cos(0.1);
+    	data->plane_x = data->plane_x * cos(ROTATE_SPEED) - data->plane_y * sin(ROTATE_SPEED);
+    	data->plane_y = old_plane_x * sin(ROTATE_SPEED) + data->plane_y * cos(ROTATE_SPEED);
 	}
 	else if (keycode == 124)
 	{
@@ -144,14 +144,17 @@ int	render_next_frame(t_data *data)
 
 		//length of ray from one x or y-side to next x or y-side
 		// possible crash ? check abs() function longer repacement
-		if (ray_dir_x == 0)
-			delta_dist_x = 1e30;
-		else
-			delta_dist_x = fabs(1 / ray_dir_x);
-		if (ray_dir_y == 0)
-			delta_dist_y = 1e30;
-		else
-			delta_dist_y = fabs(1 / ray_dir_y);
+		//if (ray_dir_x == 0)
+		//	delta_dist_x = 1e30;
+		//else
+		//	delta_dist_x = fabs(1 / ray_dir_x);
+		//if (ray_dir_y == 0)
+		//	delta_dist_y = 1e30;
+		//else
+		//	delta_dist_y = fabs(1 / ray_dir_y);
+
+		delta_dist_x = sqrt(1 + (ray_dir_y * ray_dir_y) / (ray_dir_x * ray_dir_x));
+		delta_dist_y = sqrt(1 + (ray_dir_x * ray_dir_x) / (ray_dir_y * ray_dir_y));
 
 		hit = 0;
 
@@ -207,28 +210,29 @@ int	render_next_frame(t_data *data)
 		
 		//Calculate height of line to draw on screen
       	line_height = (int)(WINHEIGHT / perp_wall_dist);
-	
+
       	//calculate lowest and highest pixel to fill in current stripe
-      	draw_start = -line_height / 2 + WINHEIGHT / 2;
+      	draw_start = (-line_height / 2) + (WINHEIGHT / 2);
       	if(draw_start < 0)
 			draw_start = 0;
-      	draw_end = line_height / 2 + WINHEIGHT / 2;
+      	draw_end = (line_height / 2) + (WINHEIGHT / 2);
       	if(draw_end >= WINHEIGHT)
 			draw_end = WINHEIGHT - 1;
 
-		color = 0x00FF00FF;
+		color = 0x00FFFFFF;
 		//give x and y sides different brightness
     	if (side == 1)
 			{color = color / 2;}
 
-		draw_vertical_line(data, x, draw_start, draw_end, color);
-
+	printf("drawstart%d\ndrawend%d\n\n", draw_start, draw_end);
+		if (draw_start < draw_end && draw_end >= 0 && draw_start >= 0)draw_vertical_line(data, x, draw_start, draw_end, color);
+		if (draw_end < WINHEIGHT && draw_end >= 0) draw_vertical_line(data, x, draw_end, (WINHEIGHT - 1), 0x00FF0000);
 		x++;
 	}
 
 
 	mlx_put_image_to_window(data->mlx->mlx, data->mlx->mlx_window, data->img->img, 0, 0);
-	usleep(500);
+	usleep(100);
 	return (0);
 }
 
