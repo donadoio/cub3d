@@ -6,7 +6,7 @@
 /*   By: idonado <idonado@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/08/21 19:12:50 by idonado       #+#    #+#                 */
-/*   Updated: 2021/10/23 19:50:18 by idonado       ########   odam.nl         */
+/*   Updated: 2021/10/23 21:33:10 by idonado       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,11 +51,11 @@ int	keypressed(int keycode, t_data	*data)
 	{
 		//both camera direction and camera plane must be rotated
     	old_dir_x = data->dir_x;
-    	data->dir_x = data->dir_x * cos(-0.1) - data->dir_y * sin(-0.1);
-    	data->dir_y = old_dir_x * sin(-0.1) + data->dir_y * cos(-0.1);
+    	data->dir_x = data->dir_x * cos(-ROTATE_SPEED) - data->dir_y * sin(-ROTATE_SPEED);
+    	data->dir_y = old_dir_x * sin(-ROTATE_SPEED) + data->dir_y * cos(-ROTATE_SPEED);
     	old_plane_x = data->plane_x;
-    	data->plane_x = data->plane_x * cos(-0.1) - data->plane_y * sin(-0.1);
-    	data->plane_y = old_plane_x * sin(-0.1) + data->plane_y * cos(-0.1);
+    	data->plane_x = data->plane_x * cos(-ROTATE_SPEED) - data->plane_y * sin(-ROTATE_SPEED);
+    	data->plane_y = old_plane_x * sin(-ROTATE_SPEED) + data->plane_y * cos(-ROTATE_SPEED);
 	}
 	return (0);
 }
@@ -82,6 +82,20 @@ int	**build_map(void)
 		}
 		i++;
 	}
+
+	worldmap[10][10] = 1;
+	worldmap[10][11] = 1;
+	worldmap[10][12] = 1;
+	worldmap[10][13] = 1;
+	worldmap[10][14] = 1;
+	worldmap[11][14] = 1;
+	worldmap[12][14] = 1;
+	worldmap[13][14] = 1;
+	worldmap[14][14] = 1;
+	worldmap[14][13] = 1;
+	worldmap[14][12] = 1;
+	worldmap[14][11] = 1;
+
 	return (worldmap);
 }
 
@@ -134,7 +148,7 @@ int	render_next_frame(t_data *data)
 	while (x < WINWIDTH)
 	{
 		//calculate ray position and directon
-		camera_x = 2 * x / (double)x - 1;
+		camera_x = 2 * x / (double)WINWIDTH - 1;
 		ray_dir_x = data->dir_x + data->plane_x * camera_x;
 		ray_dir_y = data->dir_y + data->plane_y * camera_x;
 
@@ -219,14 +233,22 @@ int	render_next_frame(t_data *data)
       	if(draw_end >= WINHEIGHT)
 			draw_end = WINHEIGHT - 1;
 
-		color = 0x00FFFFFF;
+		color = 0x00FF0055;
 		//give x and y sides different brightness
     	if (side == 1)
-			{color = color / 2;}
+			{color = 0x005500FF;}
 
 	printf("drawstart%d\ndrawend%d\n\n", draw_start, draw_end);
+		//draw wall
+		if (0 < draw_start && draw_start >= 0)draw_vertical_line(data, x, 0, draw_start, 0x00FFFFF0);
+		//draw wall
 		if (draw_start < draw_end && draw_end >= 0 && draw_start >= 0)draw_vertical_line(data, x, draw_start, draw_end, color);
+		//draw floor
 		if (draw_end < WINHEIGHT && draw_end >= 0) draw_vertical_line(data, x, draw_end, (WINHEIGHT - 1), 0x00FF0000);
+
+		//color where it hits
+		my_mlx_pixel_put(data->img, x, draw_end, 0x00000000);
+
 		x++;
 	}
 
@@ -254,8 +276,8 @@ int	main(void)
 	data->img->addr = mlx_get_data_addr(data->img->img, &data->img->bits_per_pixel, &data->img->line_length, &data->img->endian);
 
 	//giving default position coordinates
-	data->pos_x = 12;
-	data->pos_y = 12;
+	data->pos_x = 17;
+	data->pos_y = 17;
 
 	//direction coordinate
 	data->dir_x = -1;

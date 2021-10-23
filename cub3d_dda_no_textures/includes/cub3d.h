@@ -6,14 +6,14 @@
 /*   By: idonado <idonado@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/08/21 18:38:26 by idonado       #+#    #+#                 */
-/*   Updated: 2021/10/23 18:47:13 by idonado       ########   odam.nl         */
+/*   Updated: 2021/10/23 21:21:03 by idonado       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CUB3D_H
 # define CUB3D_H
-# define WINWIDTH 1020
-# define WINHEIGHT 748
+# define WINWIDTH 1024
+# define WINHEIGHT 768
 # define MAPLENGTH 24
 # define mapWidth 24
 # define mapHeight 24
