@@ -107,37 +107,6 @@ int	**build_map(void)
 
 int	render_next_frame(t_data *data)
 {
-	// used to calculate direction of ray from camera (?)
-	double	camera_x;
-
-	//direction fo ray
-	double	ray_dir_x;
-	double	ray_dir_y;
-
-	//which box of the map we're in
-    int map_x;
-    int map_y;
-
-	//length of ray from current position to next x or y-side
-    double side_dist_x;
-    double side_dist_y;
-
-	//length of ray from one x or y-side to next x or y-side
-    double delta_dist_x;
-    double delta_dist_y;
-
-	// used for calculating distance to wall
-    double perp_wall_dist;
-
-	//what direction to step in x or y-direction (either +1 or -1)
-    int step_x;
-    int step_y;
-
-	//was there a wall hit?
-	int hit = 0;
-
-	//was a NS or a EW wall hit?
-    int side;
 
 
 	//used for line size calculation when drawing column by column
@@ -154,82 +123,82 @@ int	render_next_frame(t_data *data)
 	while (x < WINWIDTH)
 	{
 		//calculate ray position and directon
-		camera_x = 2 * x / (double)WINWIDTH - 1;
-		ray_dir_x = data->dir_x + data->plane_x * camera_x;
-		ray_dir_y = data->dir_y + data->plane_y * camera_x;
+		data->camera_x = 2 * x / (double)WINWIDTH - 1;
+		data->ray_dir_x = data->dir_x + data->plane_x * data->camera_x;
+		data->ray_dir_y = data->dir_y + data->plane_y * data->camera_x;
 
 		//calculating box in map
-		map_x = (int)data->pos_x;
-		map_y = (int)data->pos_y;
+		data->map_x = (int)data->pos_x;
+		data->map_y = (int)data->pos_y;
 
 		//length of ray from one x or y-side to next x or y-side
 		// possible crash ? check abs() function longer repacement
-		//if (ray_dir_x == 0)
-		//	delta_dist_x = 1e30;
-		//else
-		//	delta_dist_x = fabs(1 / ray_dir_x);
-		//if (ray_dir_y == 0)
-		//	delta_dist_y = 1e30;
-		//else
-		//	delta_dist_y = fabs(1 / ray_dir_y);
+		if (data->ray_dir_x == 0)
+			data->delta_dist_x = 1e30;
+		else
+			data->delta_dist_x = fabs(1 / data->ray_dir_x);
+		if (data->ray_dir_y == 0)
+			data->delta_dist_y = 1e30;
+		else
+			data->delta_dist_y = fabs(1 / data->ray_dir_y);
 
-		delta_dist_x = sqrt(1 + (ray_dir_y * ray_dir_y) / (ray_dir_x * ray_dir_x));
-		delta_dist_y = sqrt(1 + (ray_dir_x * ray_dir_x) / (ray_dir_y * ray_dir_y));
+		//delta_dist_x = sqrt(1 + (ray_dir_y * ray_dir_y) / (ray_dir_x * ray_dir_x));
+		//delta_dist_y = sqrt(1 + (ray_dir_x * ray_dir_x) / (ray_dir_y * ray_dir_y));
 
-		hit = 0;
+		data->hit = 0;
 
 		//calculate step and initial sideDist
-		if (ray_dir_x < 0)
+		if (data->ray_dir_x < 0)
 		{
-			step_x = -1;
-			side_dist_x = (data->pos_x - map_x) * delta_dist_x;
+			data->step_x = -1;
+			data->side_dist_x = (data->pos_x - data->map_x) * data->delta_dist_x;
 		}
 		else
 		{
-			step_x = 1;
-			side_dist_x = (map_x + 1.0 - data->pos_x) * delta_dist_x;
+			data->step_x = 1;
+			data->side_dist_x = (data->map_x + 1.0 - data->pos_x) * data->delta_dist_x;
 		}
-		if (ray_dir_y < 0)
+		if (data->ray_dir_y < 0)
 		{
-			step_y = -1;
-			side_dist_y = (data->pos_y - map_y) * delta_dist_y;
+			data->step_y = -1;
+			data->side_dist_y = (data->pos_y - data->map_y) * data->delta_dist_y;
 		}
 		else
 		{
-			step_y = 1;
-			side_dist_y = (map_y + 1.0 - data->pos_y) * delta_dist_y;
+			data->step_y = 1;
+			data->side_dist_y = (data->map_y + 1.0 - data->pos_y) * data->delta_dist_y;
 		}
 		
 
 		//DDA algorithm
-		while (hit == 0)
+		while (data->hit == 0)
 		{
 			//jump to next map square, either in x-direction, or in y-direction
-        	if (side_dist_x < side_dist_y)
+        	if (data->side_dist_x < data->side_dist_y)
         	{
-        	  side_dist_x += delta_dist_x;
-        	  map_x += step_x;
-        	  side = 0;
+        	  data->side_dist_x += data->delta_dist_x;
+        	  data->map_x += data->step_x;
+        	  data->side = 0;
         	}
         	else
         	{
-        	  side_dist_y += delta_dist_y;
-        	  map_y += step_y;
-        	  side = 1;
+        	  data->side_dist_y += data->delta_dist_y;
+        	  data->map_y += data->step_y;
+        	  data->side = 1;
         	}
         	//Check if ray has hit a wall
-        	if (data->map[map_x][map_y] > 0)
-				hit = 1;
+        	if (data->map[data->map_x][data->map_y] > 0)
+				data->hit = 1;
 		}
 
 		//Calculate distance projected on camera direction 
-      	if(side == 0)
-			perp_wall_dist = (side_dist_x - delta_dist_x);
+      	if(data->side == 0)
+			data->perp_wall_dist = (data->side_dist_x - data->delta_dist_x);
       	else
-			perp_wall_dist = (side_dist_y - delta_dist_y);
+			data->perp_wall_dist = (data->side_dist_y - data->delta_dist_y);
 		
 		//Calculate height of line to draw on screen
-      	line_height = (int)(WINHEIGHT / perp_wall_dist);
+      	line_height = (int)(WINHEIGHT / data->perp_wall_dist);
 
       	//calculate lowest and highest pixel to fill in current stripe
       	draw_start = (-line_height / 2) + (WINHEIGHT / 2);
@@ -241,7 +210,7 @@ int	render_next_frame(t_data *data)
 
 		color = 0x00FF0055;
 		//give x and y sides different brightness
-    	if (side == 1)
+    	if (data->side == 1)
 			{color = 0x005500FF;}
 
 	printf("drawstart%d\ndrawend%d\n\n", draw_start, draw_end);
@@ -250,7 +219,7 @@ int	render_next_frame(t_data *data)
 		//draw wall
 		if (draw_start < draw_end && draw_end >= 0 && draw_start >= 0)draw_vertical_line(data, x, draw_start, draw_end, color);
 		//draw floor
-		if (draw_end < WINHEIGHT && draw_end >= 0) draw_vertical_line(data, x, draw_end, (WINHEIGHT - 1), 0x00FF0000);
+		if (draw_end < WINHEIGHT && draw_end >= 0) draw_vertical_line(data, x, draw_end, (WINHEIGHT), 0x00FF0000);
 
 		//color where it hits
 		my_mlx_pixel_put(data->img, x, draw_end, 0x00000000);
@@ -289,8 +258,8 @@ int	main(void)
 	data->img->addr = mlx_get_data_addr(data->img->img, &data->img->bits_per_pixel, &data->img->line_length, &data->img->endian);
 
 	//giving default position coordinates
-	data->pos_x = 20;
-	data->pos_y = 19;
+	data->pos_x = 22;
+	data->pos_y = 12;
 
 	//direction coordinate
 	data->dir_x = -1;
@@ -298,7 +267,7 @@ int	main(void)
 
 	//camera plane
 	data->plane_x = 0;
-	data->plane_y = 1;
+	data->plane_y = 0.66;
 
 
 	// key hooks and game loop

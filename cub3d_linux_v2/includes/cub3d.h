@@ -70,6 +70,39 @@ typedef struct s_data
 	double	old_time;
 	double	move_speed;
 	double	rot_speed;
+
+
+	// used to calculate direction of ray from camera (?)
+	double	camera_x;
+
+	//direction fo ray
+	double	ray_dir_x;
+	double	ray_dir_y;
+
+	//which box of the map we're in
+    int map_x;
+    int map_y;
+
+	//length of ray from current position to next x or y-side
+    double side_dist_x;
+    double side_dist_y;
+
+	//length of ray from one x or y-side to next x or y-side
+    double delta_dist_x;
+    double delta_dist_y;
+
+	// used for calculating distance to wall
+    double perp_wall_dist;
+
+	//what direction to step in x or y-direction (either +1 or -1)
+    int step_x;
+    int step_y;
+
+	//was there a wall hit?
+	int hit;
+
+	//was a NS or a EW wall hit?
+    int side;
 }				t_data;
 
 //console stuff
