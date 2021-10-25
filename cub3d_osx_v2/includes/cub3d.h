@@ -6,7 +6,7 @@
 /*   By: idonado <idonado@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/08/21 18:38:26 by idonado       #+#    #+#                 */
-/*   Updated: 2021/10/25 17:30:57 by idonado       ########   odam.nl         */
+/*   Updated: 2021/10/25 17:53:48 by idonado       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ typedef struct s_data
 {
 	t_mlx_vars	*mlx;
 	t_img_data	*img;
+	t_img_data	*texture;
 	int			**map;
 
 	// position and direction variables

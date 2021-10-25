@@ -6,7 +6,7 @@
 /*   By: idonado <idonado@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/08/21 19:12:50 by idonado       #+#    #+#                 */
-/*   Updated: 2021/10/25 17:47:12 by idonado       ########   odam.nl         */
+/*   Updated: 2021/10/25 18:11:32 by idonado       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -230,7 +230,7 @@ int	render_next_frame(t_data *data)
     	if (data->side == 1)
 			{color = 0x005500FF;}
 
-	printf("drawstart%d\ndrawend%d\n\n", draw_start, draw_end);
+	//printf("drawstart%d\ndrawend%d\n\n", draw_start, draw_end);
 		//draw wall
 		if (0 < draw_start && draw_start >= 0)draw_vertical_line(data, x, 0, draw_start, 0x00FFFFF0);
 		//draw wall
@@ -264,6 +264,7 @@ int	main(void)
 	data = malloc(sizeof(t_data));
 	data->mlx = malloc(sizeof(t_mlx_vars));
 	data->img = malloc(sizeof(t_img_data));
+	data->texture = malloc(sizeof(t_img_data));
 
 	data->map = build_map();
 	print_map(data);
@@ -273,6 +274,12 @@ int	main(void)
 	data->mlx->mlx_window = mlx_new_window(data->mlx->mlx, WINWIDTH, WINHEIGHT, "cub3d");
 	data->img->img = mlx_new_image(data->mlx->mlx, WINWIDTH, WINHEIGHT);
 	data->img->addr = mlx_get_data_addr(data->img->img, &data->img->bits_per_pixel, &data->img->line_length, &data->img->endian);
+
+	//initialize texture img
+	data->texture->img = mlx_xpm_file_to_image(data->mlx->mlx, \
+	"./img/wall.xpm", &data->texture->width, \
+	&data->texture->height);
+	data->texture->addr = mlx_get_data_addr(data->texture->img, &data->texture->bits_per_pixel, &data->texture->line_length, &data->texture->endian);
 
 	//giving default position coordinates
 	data->pos_x = 22;
