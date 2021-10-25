@@ -6,7 +6,7 @@
 /*   By: idonado <idonado@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/08/21 19:12:50 by idonado       #+#    #+#                 */
-/*   Updated: 2021/10/25 19:53:09 by idonado       ########   odam.nl         */
+/*   Updated: 2021/10/25 21:35:57 by idonado       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -184,6 +184,9 @@ int	render_next_frame(t_data *data)
 	int	y;
 	int	d;
 	int i;
+	int	text_number;
+
+	text_number = 1;
 
 	x = 0;
 
@@ -302,6 +305,32 @@ int	render_next_frame(t_data *data)
 		y = draw_start;
 		if (draw_start < draw_end && draw_end >= 0 && draw_start >= 0)
 		{
+
+			//set textures
+			if (0 > data->step_x && data->side == 0 && text_number != 1)
+			{
+				set_tex_1(data);
+				text_number = 1;
+			}
+			else if (0 <= data->step_x && data->side == 0 && text_number != 2)
+			{
+				set_tex_2(data);
+				text_number = 2;
+			}
+			if (data->side == 1)
+			{
+				if (0 > data->step_y && text_number != 3)
+				{
+					set_tex_3(data);
+					text_number = 3;
+				}
+				else if (0 <= data->step_y && text_number != 4)
+				{
+					set_tex_4(data);
+					text_number = 4;
+				}
+			}
+
 			while (y < draw_end)
 			{
 				d = y * 256 - WINHEIGHT * 128 + line_height * 128;
@@ -361,7 +390,6 @@ int	main(void)
 	data->mlx->mlx_window = mlx_new_window(data->mlx->mlx, WINWIDTH, WINHEIGHT, "cub3d");
 	data->img->img = mlx_new_image(data->mlx->mlx, WINWIDTH, WINHEIGHT);
 	data->img->addr = mlx_get_data_addr(data->img->img, &data->img->bits_per_pixel, &data->img->line_length, &data->img->endian);
-
 	set_tex_1(data);
 
 
