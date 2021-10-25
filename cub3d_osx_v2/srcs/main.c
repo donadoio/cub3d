@@ -6,11 +6,47 @@
 /*   By: idonado <idonado@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/08/21 19:12:50 by idonado       #+#    #+#                 */
-/*   Updated: 2021/10/25 18:11:32 by idonado       ########   odam.nl         */
+/*   Updated: 2021/10/25 19:53:09 by idonado       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <cub3d.h>
+
+void	set_tex_1(t_data *data)
+{
+	data->texture->img = mlx_xpm_file_to_image(data->mlx->mlx, \
+	"./img/wall.xpm", &data->texture->width, \
+	&data->texture->height);
+	data->texture->addr = mlx_get_data_addr(data->texture->img, &data->texture->bits_per_pixel, &data->texture->line_length, &data->texture->endian);
+	return ;
+}
+
+void	set_tex_2(t_data *data)
+{
+	data->texture->img = mlx_xpm_file_to_image(data->mlx->mlx, \
+	"./img/collect.xpm", &data->texture->width, \
+	&data->texture->height);
+	data->texture->addr = mlx_get_data_addr(data->texture->img, &data->texture->bits_per_pixel, &data->texture->line_length, &data->texture->endian);
+	return ;
+}
+
+void	set_tex_3(t_data *data)
+{
+	data->texture->img = mlx_xpm_file_to_image(data->mlx->mlx, \
+	"./img/exit.xpm", &data->texture->width, \
+	&data->texture->height);
+	data->texture->addr = mlx_get_data_addr(data->texture->img, &data->texture->bits_per_pixel, &data->texture->line_length, &data->texture->endian);
+	return ;
+}
+
+void	set_tex_4(t_data *data)
+{
+	data->texture->img = mlx_xpm_file_to_image(data->mlx->mlx, \
+	"./img/player.xpm", &data->texture->width, \
+	&data->texture->height);
+	data->texture->addr = mlx_get_data_addr(data->texture->img, &data->texture->bits_per_pixel, &data->texture->line_length, &data->texture->endian);
+	return ;
+}
 
 int	keypressed(int keycode, t_data	*data)
 {
@@ -135,6 +171,20 @@ int	render_next_frame(t_data *data)
 	int	color;
 	int		x;
 
+
+
+	//for wall texture stuff
+	//calculate value of wallX
+	int	tex_width = 1000;
+	int	tex_height = 1000;
+    double wall_x; //where exactly the wall was hit
+    //x coordinate on the texture
+    int tex_x;
+	int	tex_y;
+	int	y;
+	int	d;
+	int i;
+
 	x = 0;
 
 	while (x < WINWIDTH)
@@ -233,8 +283,45 @@ int	render_next_frame(t_data *data)
 	//printf("drawstart%d\ndrawend%d\n\n", draw_start, draw_end);
 		//draw wall
 		if (0 < draw_start && draw_start >= 0)draw_vertical_line(data, x, 0, draw_start, 0x00FFFFF0);
+
+
+
 		//draw wall
-		if (draw_start < draw_end && draw_end >= 0 && draw_start >= 0)draw_vertical_line(data, x, draw_start, draw_end, color);
+		//if (draw_start < draw_end && draw_end >= 0 && draw_start >= 0)draw_vertical_line(data, x, draw_start, draw_end, color);
+
+		//draw texture wall
+		if (data->side == 0) wall_x = data->pos_y + data->perp_wall_dist * data->ray_dir_y;
+		else wall_x = data->pos_x + data->perp_wall_dist * data->ray_dir_x;
+
+		wall_x = wall_x - floor(wall_x);
+
+		//x coordinate on the texture
+		tex_x = (int)(wall_x * (double)tex_width);
+		if (data->side == 0 && data->ray_dir_x > 0) tex_x = tex_width - tex_x - 1;
+		if (data->side == 1 && data->ray_dir_y < 0) tex_x = tex_width - tex_x - 1;
+		y = draw_start;
+		if (draw_start < draw_end && draw_end >= 0 && draw_start >= 0)
+		{
+			while (y < draw_end)
+			{
+				d = y * 256 - WINHEIGHT * 128 + line_height * 128;
+				tex_y = ((d * tex_height) / line_height) / 256;
+
+				i = 0;
+				while (i < 3)
+				{
+					data->img->addr[y * data->img->line_length + x * data->img->bits_per_pixel / 8 + i] = \
+					data->texture->addr[tex_y * data->texture->line_length + tex_x * data->texture->bits_per_pixel / 8 + i];
+					i++;
+				}
+
+				y++;
+			}
+		}
+
+
+
+
 		//draw floor
 		if (draw_end < WINHEIGHT && draw_end >= 0) draw_vertical_line(data, x, draw_end, (WINHEIGHT), 0x00FF0000);
 
@@ -275,11 +362,8 @@ int	main(void)
 	data->img->img = mlx_new_image(data->mlx->mlx, WINWIDTH, WINHEIGHT);
 	data->img->addr = mlx_get_data_addr(data->img->img, &data->img->bits_per_pixel, &data->img->line_length, &data->img->endian);
 
-	//initialize texture img
-	data->texture->img = mlx_xpm_file_to_image(data->mlx->mlx, \
-	"./img/wall.xpm", &data->texture->width, \
-	&data->texture->height);
-	data->texture->addr = mlx_get_data_addr(data->texture->img, &data->texture->bits_per_pixel, &data->texture->line_length, &data->texture->endian);
+	set_tex_1(data);
+
 
 	//giving default position coordinates
 	data->pos_x = 22;
