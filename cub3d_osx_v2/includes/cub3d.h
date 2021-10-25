@@ -6,7 +6,7 @@
 /*   By: idonado <idonado@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/08/21 18:38:26 by idonado       #+#    #+#                 */
-/*   Updated: 2021/10/25 17:53:48 by idonado       ########   odam.nl         */
+/*   Updated: 2021/10/25 21:59:32 by idonado       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 # define MAPLENGTH 24
 # define mapWidth 24
 # define mapHeight 24
-# define ROTATE_SPEED 0.06
+# define ROTATE_SPEED 0.05
 # define MOVE_SPEED 0.28
 # define PI 3.1415926435
 # include <unistd.h>
