@@ -6,46 +6,80 @@
 /*   By: idonado <idonado@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/08/21 19:12:50 by idonado       #+#    #+#                 */
-/*   Updated: 2021/10/25 22:21:51 by idonado       ########   odam.nl         */
+/*   Updated: 2021/10/28 21:01:01 by idonado       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <cub3d.h>
 
-void	set_tex_1(t_data *data)
+int	check_next_pos_up_x(t_data *data)
 {
-	data->texture->img = mlx_xpm_file_to_image(data->mlx->mlx, \
-	"./img/wall.xpm", &data->texture->width, \
-	&data->texture->height);
-	data->texture->addr = mlx_get_data_addr(data->texture->img, &data->texture->bits_per_pixel, &data->texture->line_length, &data->texture->endian);
-	return ;
+	int		temp_int;
+	float	temp_float;
+	float	value;
+	int		pos_next;
+
+	value = data->pos_x + data->dir_x * MOVE_SPEED;
+	temp_int = (int)value;
+	temp_float = value - (float)temp_int;
+	if (data->dir_x > 0)
+	{
+		pos_next = (int)data->pos_x + 1;
+	}
+	else
+	{
+		pos_next = (int)data->pos_x - 1;
+	}
+	if ((int)data->pos_x == (int)value && data->map[pos_next][(int)data->pos_y] == 1)
+	{
+		if (pos_next > (int)data->pos_x && temp_float > 0.75)
+		{
+			printf("Denied move up to x %f\n", value);
+			return (0);
+		}
+		else if (pos_next < (int)data->pos_x && temp_float < 0.25)
+		{
+			printf("Denied move up to x %f\n", value);
+			return (0);
+		}
+	}
+	return (1);
 }
 
-void	set_tex_2(t_data *data)
+int	check_next_pos_up_y(t_data *data)
 {
-	data->texture->img = mlx_xpm_file_to_image(data->mlx->mlx, \
-	"./img/collect.xpm", &data->texture->width, \
-	&data->texture->height);
-	data->texture->addr = mlx_get_data_addr(data->texture->img, &data->texture->bits_per_pixel, &data->texture->line_length, &data->texture->endian);
-	return ;
-}
+	int		temp_int;
+	float	temp_float;
+	float	value;
+	int		pos_next;
 
-void	set_tex_3(t_data *data)
-{
-	data->texture->img = mlx_xpm_file_to_image(data->mlx->mlx, \
-	"./img/exit.xpm", &data->texture->width, \
-	&data->texture->height);
-	data->texture->addr = mlx_get_data_addr(data->texture->img, &data->texture->bits_per_pixel, &data->texture->line_length, &data->texture->endian);
-	return ;
-}
-
-void	set_tex_4(t_data *data)
-{
-	data->texture->img = mlx_xpm_file_to_image(data->mlx->mlx, \
-	"./img/player.xpm", &data->texture->width, \
-	&data->texture->height);
-	data->texture->addr = mlx_get_data_addr(data->texture->img, &data->texture->bits_per_pixel, &data->texture->line_length, &data->texture->endian);
-	return ;
+	value = data->pos_y + data->dir_y * MOVE_SPEED;
+	temp_int = (int)value;
+	temp_float = value - (float)temp_int;
+	if (data->dir_y > 0)
+	{
+		printf("facing east?\n");
+		pos_next = (int)data->pos_y + 1;
+	}
+	else
+	{
+		printf("facing west?\n");
+		pos_next = (int)data->pos_y - 1;
+	}
+	if ((int)data->pos_y == (int)value && data->map[(int)data->pos_x][pos_next] == 1)
+	{
+		if (pos_next > (int)data->pos_y && temp_float > 0.75)
+		{
+			printf("Denied move up to y %f\n", value);
+			return (0);
+		}
+		else if (pos_next < (int)data->pos_y && temp_float < 0.25)
+		{
+			printf("Denied move up to y %f\n", value);
+			return (0);
+		}
+	}
+	return (1);
 }
 
 int	keypressed(int keycode, t_data	*data)
@@ -53,17 +87,16 @@ int	keypressed(int keycode, t_data	*data)
 	double	old_dir_x;
 	double	old_plane_x;
 	
-	clear_screen(data);
 	if (keycode == UP_KEY)
 	{
-		if(data->map[(int)(data->pos_x + data->dir_x * MOVE_SPEED)][(int)(data->pos_y)] == 0) data->pos_x = data->pos_x + data->dir_x * MOVE_SPEED;
-    	if(data->map[(int)(data->pos_x)][(int)(data->pos_y + data->dir_y * MOVE_SPEED)] == 0) data->pos_y = data->pos_y + data->dir_y * MOVE_SPEED;
+		if(data->map[(int)(data->pos_x + data->dir_x * MOVE_SPEED)][(int)(data->pos_y)] == 0 && check_next_pos_up_x(data) == 1) data->pos_x = data->pos_x + data->dir_x * MOVE_SPEED;
+    	if(data->map[(int)(data->pos_x)][(int)(data->pos_y + data->dir_y * MOVE_SPEED)] == 0 && check_next_pos_up_y(data) == 1) data->pos_y = data->pos_y + data->dir_y * MOVE_SPEED;
 		render_next_frame(data);
 	}
 	else if (keycode == DOWN_KEY)
 	{
 		if(data->map[(int)(data->pos_x - data->dir_x * MOVE_SPEED)][(int)(data->pos_y)] == 0) data->pos_x = data->pos_x - data->dir_x * MOVE_SPEED;
-    	if(data->map[(int)(data->pos_x)][(int)(data->pos_y + data->dir_y - MOVE_SPEED)] == 0) data->pos_y = data->pos_y - data->dir_y * MOVE_SPEED;
+    	if(data->map[(int)(data->pos_x)][(int)(data->pos_y - data->dir_y * MOVE_SPEED)] == 0) data->pos_y = data->pos_y - data->dir_y * MOVE_SPEED;
 		render_next_frame(data);
 	}
 	else if (keycode == LEFT_KEY)
@@ -263,24 +296,24 @@ int	render_next_frame(t_data *data)
 		//set textures
 		if (0 > data->step_x && data->side == 0 && text_number != 1)
 		{
-			set_tex_1(data);
+			data->loaded_texture = data->texture_1;
 			text_number = 1;
 		}
 		else if (0 <= data->step_x && data->side == 0 && text_number != 2)
 		{
-			set_tex_2(data);
+			data->loaded_texture = data->texture_2;
 			text_number = 2;
 		}
 		else if (data->side == 1)
 		{
 			if (0 > data->step_y && text_number != 3)
 			{
-				set_tex_3(data);
+				data->loaded_texture = data->texture_3;
 				text_number = 3;
 			}
 			else if (0 <= data->step_y && text_number != 4)
 			{
-				set_tex_4(data);
+				data->loaded_texture = data->texture_4;
 				text_number = 4;
 			}
 		}
@@ -332,7 +365,7 @@ int	render_next_frame(t_data *data)
 				while (i < 3)
 				{
 					data->img->addr[y * data->img->line_length + x * data->img->bits_per_pixel / 8 + i] = \
-					data->texture->addr[tex_y * data->texture->line_length + tex_x * data->texture->bits_per_pixel / 8 + i];
+					data->loaded_texture->addr[tex_y * data->loaded_texture->line_length + tex_x * data->loaded_texture->bits_per_pixel / 8 + i];
 					i++;
 				}
 
@@ -354,7 +387,12 @@ int	render_next_frame(t_data *data)
 
 
 	mlx_put_image_to_window(data->mlx->mlx, data->mlx->mlx_window, data->img->img, 0, 0);
-	printf("\ndir_x:%f, dir_y:%f\n", data->dir_x, data->dir_y);
+	//mlx_sync(MLX_SYNC_WIN_FLUSH_CMD, data->mlx->mlx_window);
+	//mlx_sync(MLX_SYNC_WIN_CMD_COMPLETED, data->mlx->mlx_window);
+
+
+
+	printf("\ndir_x:%f, dir_y:%f\npos: %f, %f\n", data->dir_x, data->dir_y, data->pos_x, data->pos_y);
 	return (0);
 }
 
@@ -372,7 +410,10 @@ int	main(void)
 	data = malloc(sizeof(t_data));
 	data->mlx = malloc(sizeof(t_mlx_vars));
 	data->img = malloc(sizeof(t_img_data));
-	data->texture = malloc(sizeof(t_img_data));
+	data->texture_1 = malloc(sizeof(t_img_data));
+	data->texture_2 = malloc(sizeof(t_img_data));
+	data->texture_3 = malloc(sizeof(t_img_data));
+	data->texture_4 = malloc(sizeof(t_img_data));
 
 	data->map = build_map();
 	print_map(data);
@@ -382,6 +423,30 @@ int	main(void)
 	data->mlx->mlx_window = mlx_new_window(data->mlx->mlx, WINWIDTH, WINHEIGHT, "cub3d");
 	data->img->img = mlx_new_image(data->mlx->mlx, WINWIDTH, WINHEIGHT);
 	data->img->addr = mlx_get_data_addr(data->img->img, &data->img->bits_per_pixel, &data->img->line_length, &data->img->endian);
+
+	//load_textures
+	data->texture_1->img = mlx_xpm_file_to_image(data->mlx->mlx, \
+	"./img/wall.xpm", &data->texture_1->width, \
+	&data->texture_1->height);
+	data->texture_1->addr = mlx_get_data_addr(data->texture_1->img, &data->texture_1->bits_per_pixel, &data->texture_1->line_length, &data->texture_1->endian);
+
+	data->texture_2->img = mlx_xpm_file_to_image(data->mlx->mlx, \
+	"./img/collect.xpm", &data->texture_2->width, \
+	&data->texture_2->height);
+	data->texture_2->addr = mlx_get_data_addr(data->texture_2->img, &data->texture_2->bits_per_pixel, &data->texture_2->line_length, &data->texture_2->endian);
+
+	data->texture_3->img = mlx_xpm_file_to_image(data->mlx->mlx, \
+	"./img/exit.xpm", &data->texture_3->width, \
+	&data->texture_3->height);
+	data->texture_3->addr = mlx_get_data_addr(data->texture_3->img, &data->texture_3->bits_per_pixel, &data->texture_3->line_length, &data->texture_3->endian);
+
+	data->texture_4->img = mlx_xpm_file_to_image(data->mlx->mlx, \
+	"./img/player.xpm", &data->texture_4->width, \
+	&data->texture_4->height);
+	data->texture_4->addr = mlx_get_data_addr(data->texture_4->img, &data->texture_4->bits_per_pixel, &data->texture_4->line_length, &data->texture_4->endian);
+
+	//mlx_sync main img
+	//mlx_sync(MLX_SYNC_IMAGE_WRITABLE, data->img->img);
 
 
 	//giving default position coordinates
