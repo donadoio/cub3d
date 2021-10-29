@@ -6,7 +6,7 @@
 /*   By: idonado <idonado@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/08/21 18:38:26 by idonado       #+#    #+#                 */
-/*   Updated: 2021/10/28 20:49:00 by idonado       ########   odam.nl         */
+/*   Updated: 2021/10/29 18:24:48 by idonado       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,6 +113,12 @@ typedef struct s_data
 
 //console stuff
 void	print_map(t_data *data);
+
+//grid_check
+int	check_next_pos_up_x(t_data *data);
+int	check_next_pos_up_y(t_data *data);
+int	check_next_pos_down_x(t_data *data);
+int	check_next_pos_down_y(t_data *data);
 
 //Graphic stuff
 void	my_mlx_pixel_put(t_img_data *data, int x, int y, int color);
