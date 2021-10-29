@@ -6,7 +6,7 @@
 /*   By: idonado <idonado@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/08/21 18:38:26 by idonado       #+#    #+#                 */
-/*   Updated: 2021/10/23 21:21:03 by idonado       ########   odam.nl         */
+/*   Updated: 2021/10/28 20:49:00 by idonado       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,8 @@
 # define MAPLENGTH 24
 # define mapWidth 24
 # define mapHeight 24
-# define ROTATE_SPEED 0.04
-# define MOVE_SPEED 0.14
+# define ROTATE_SPEED 0.05
+# define MOVE_SPEED 0.28
 # define PI 3.1415926435
 # include <unistd.h>
 # include <stdio.h>
@@ -27,6 +27,7 @@
 # include <fcntl.h>
 # include <mlx.h>
 # include <math.h>
+# include <keycodes_ubuntu.h>
 
 typedef enum e_bool{
 	False,
@@ -53,6 +54,11 @@ typedef struct s_data
 {
 	t_mlx_vars	*mlx;
 	t_img_data	*img;
+	t_img_data	*texture_1;
+	t_img_data	*texture_2;
+	t_img_data	*texture_3;
+	t_img_data	*texture_4;
+	t_img_data	*loaded_texture;
 	int			**map;
 
 	// position and direction variables

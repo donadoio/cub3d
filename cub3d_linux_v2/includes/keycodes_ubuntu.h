@@ -7,4 +7,7 @@
 #  define RIGHT_KEY 100
 #  define ESC_KEY 65307
 
+# define LEFT_ROTATE 65361
+# define RIGHT_ROTATE 65363
+
 #endif

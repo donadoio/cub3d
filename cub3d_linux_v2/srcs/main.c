@@ -6,38 +6,122 @@
 /*   By: idonado <idonado@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/08/21 19:12:50 by idonado       #+#    #+#                 */
-/*   Updated: 2021/10/23 21:33:10 by idonado       ########   odam.nl         */
+/*   Updated: 2021/10/28 21:01:01 by idonado       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <cub3d.h>
-#include <keycodes_ubuntu.h> 
+
+int	check_next_pos_up_x(t_data *data)
+{
+	int		temp_int;
+	float	temp_float;
+	float	value;
+	int		pos_next;
+
+	value = data->pos_x + data->dir_x * MOVE_SPEED;
+	temp_int = (int)value;
+	temp_float = value - (float)temp_int;
+	if (data->dir_x > 0)
+	{
+		pos_next = (int)data->pos_x + 1;
+	}
+	else
+	{
+		pos_next = (int)data->pos_x - 1;
+	}
+	if ((int)data->pos_x == (int)value && data->map[pos_next][(int)data->pos_y] == 1)
+	{
+		if (pos_next > (int)data->pos_x && temp_float > 0.75)
+		{
+			printf("Denied move up to x %f\n", value);
+			return (0);
+		}
+		else if (pos_next < (int)data->pos_x && temp_float < 0.25)
+		{
+			printf("Denied move up to x %f\n", value);
+			return (0);
+		}
+	}
+	return (1);
+}
+
+int	check_next_pos_up_y(t_data *data)
+{
+	int		temp_int;
+	float	temp_float;
+	float	value;
+	int		pos_next;
+
+	value = data->pos_y + data->dir_y * MOVE_SPEED;
+	temp_int = (int)value;
+	temp_float = value - (float)temp_int;
+	if (data->dir_y > 0)
+	{
+		printf("facing east?\n");
+		pos_next = (int)data->pos_y + 1;
+	}
+	else
+	{
+		printf("facing west?\n");
+		pos_next = (int)data->pos_y - 1;
+	}
+	if ((int)data->pos_y == (int)value && data->map[(int)data->pos_x][pos_next] == 1)
+	{
+		if (pos_next > (int)data->pos_y && temp_float > 0.75)
+		{
+			printf("Denied move up to y %f\n", value);
+			return (0);
+		}
+		else if (pos_next < (int)data->pos_y && temp_float < 0.25)
+		{
+			printf("Denied move up to y %f\n", value);
+			return (0);
+		}
+	}
+	return (1);
+}
 
 int	keypressed(int keycode, t_data	*data)
 {
 	double	old_dir_x;
 	double	old_plane_x;
 	
-	clear_screen(data);
 	if (keycode == UP_KEY)
 	{
-		if(data->map[(int)(data->pos_x + data->dir_x * MOVE_SPEED)][(int)(data->pos_y)] == 0) data->pos_x = data->pos_x + data->dir_x * MOVE_SPEED;
-    	if(data->map[(int)(data->pos_x)][(int)(data->pos_y + data->dir_y * MOVE_SPEED)] == 0) data->pos_y = data->pos_y + data->dir_y * MOVE_SPEED;
+		if(data->map[(int)(data->pos_x + data->dir_x * MOVE_SPEED)][(int)(data->pos_y)] == 0 && check_next_pos_up_x(data) == 1) data->pos_x = data->pos_x + data->dir_x * MOVE_SPEED;
+    	if(data->map[(int)(data->pos_x)][(int)(data->pos_y + data->dir_y * MOVE_SPEED)] == 0 && check_next_pos_up_y(data) == 1) data->pos_y = data->pos_y + data->dir_y * MOVE_SPEED;
 		render_next_frame(data);
 	}
 	else if (keycode == DOWN_KEY)
 	{
-		printf("DOWN\n");
+		if(data->map[(int)(data->pos_x - data->dir_x * MOVE_SPEED)][(int)(data->pos_y)] == 0) data->pos_x = data->pos_x - data->dir_x * MOVE_SPEED;
+    	if(data->map[(int)(data->pos_x)][(int)(data->pos_y - data->dir_y * MOVE_SPEED)] == 0) data->pos_y = data->pos_y - data->dir_y * MOVE_SPEED;
+		render_next_frame(data);
 	}
 	else if (keycode == LEFT_KEY)
 	{
-		printf("LEFT\n");
+		double	look_dir_x;
+		double	look_dir_y;
+
+		look_dir_x = data->dir_y;
+		look_dir_y = data->dir_x;
+		if (data->map[(int)(data->pos_x - look_dir_x * MOVE_SPEED)][(int)(data->pos_y)] == 0)data->pos_x -= look_dir_x * MOVE_SPEED;
+		if (data->map[(int)(data->pos_x)][(int)(data->pos_y + look_dir_y * MOVE_SPEED)] == 0)data->pos_y += look_dir_y * MOVE_SPEED;
+		render_next_frame(data);
 	}
 	else if (keycode == RIGHT_KEY)
 	{
-		printf("RIGHT\n");
+		double	look_dir_x;
+		double	look_dir_y;
+
+		look_dir_x = data->dir_y;
+		look_dir_y = data->dir_x;
+		if (data->map[(int)(data->pos_x + look_dir_x * MOVE_SPEED)][(int)(data->pos_y)] == 0)data->pos_x += look_dir_x * MOVE_SPEED;
+		if (data->map[(int)(data->pos_x)][(int)(data->pos_y - look_dir_y * MOVE_SPEED)] == 0)data->pos_y -= look_dir_y * MOVE_SPEED;
+		render_next_frame(data);
 	}
-	else if (keycode == 65361)
+	else if (keycode == LEFT_ROTATE)
 	{
 		//both camera direction and camera plane must be rotated
     	old_dir_x = data->dir_x;
@@ -48,7 +132,7 @@ int	keypressed(int keycode, t_data	*data)
     	data->plane_y = old_plane_x * sin(ROTATE_SPEED) + data->plane_y * cos(ROTATE_SPEED);
 		render_next_frame(data);
 	}
-	else if (keycode == 65363)
+	else if (keycode == RIGHT_ROTATE)
 	{
 		//both camera direction and camera plane must be rotated
     	old_dir_x = data->dir_x;
@@ -59,6 +143,8 @@ int	keypressed(int keycode, t_data	*data)
     	data->plane_y = old_plane_x * sin(-ROTATE_SPEED) + data->plane_y * cos(-ROTATE_SPEED);
 		render_next_frame(data);
 	}
+	else
+		printf("keycode=%d\n", keycode);
 	return (0);
 }
 
@@ -91,7 +177,7 @@ int	**build_map(void)
 	worldmap[10][13] = 1;
 	worldmap[10][14] = 1;
 	worldmap[11][14] = 1;
-	worldmap[12][14] = 1;
+	worldmap[12][14] = 0;
 	worldmap[13][14] = 1;
 	worldmap[14][14] = 1;
 	worldmap[14][13] = 1;
@@ -115,8 +201,24 @@ int	render_next_frame(t_data *data)
     int draw_start;
     int draw_end;
 
-	int	color;
 	int		x;
+
+
+
+	//for wall texture stuff
+	//calculate value of wallX
+	int	tex_width = 1000;
+	int	tex_height = 1000;
+    double wall_x; //where exactly the wall was hit
+    //x coordinate on the texture
+    int tex_x;
+	int	tex_y;
+	int	y;
+	int	d;
+	int i;
+	int	text_number;
+
+	text_number = 5;
 
 	x = 0;
 
@@ -191,6 +293,31 @@ int	render_next_frame(t_data *data)
 				data->hit = 1;
 		}
 
+		//set textures
+		if (0 > data->step_x && data->side == 0 && text_number != 1)
+		{
+			data->loaded_texture = data->texture_1;
+			text_number = 1;
+		}
+		else if (0 <= data->step_x && data->side == 0 && text_number != 2)
+		{
+			data->loaded_texture = data->texture_2;
+			text_number = 2;
+		}
+		else if (data->side == 1)
+		{
+			if (0 > data->step_y && text_number != 3)
+			{
+				data->loaded_texture = data->texture_3;
+				text_number = 3;
+			}
+			else if (0 <= data->step_y && text_number != 4)
+			{
+				data->loaded_texture = data->texture_4;
+				text_number = 4;
+			}
+		}
+
 		//Calculate distance projected on camera direction 
       	if(data->side == 0)
 			data->perp_wall_dist = (data->side_dist_x - data->delta_dist_x);
@@ -208,16 +335,47 @@ int	render_next_frame(t_data *data)
       	if(draw_end >= WINHEIGHT)
 			draw_end = WINHEIGHT - 1;
 
-		color = 0x00FF0055;
-		//give x and y sides different brightness
-    	if (data->side == 1)
-			{color = 0x005500FF;}
 
-	printf("drawstart%d\ndrawend%d\n\n", draw_start, draw_end);
-		//draw wall
+	//printf("drawstart%d\ndrawend%d\n\n", draw_start, draw_end);
+		//draw roof
 		if (0 < draw_start && draw_start >= 0)draw_vertical_line(data, x, 0, draw_start, 0x00FFFFF0);
-		//draw wall
-		if (draw_start < draw_end && draw_end >= 0 && draw_start >= 0)draw_vertical_line(data, x, draw_start, draw_end, color);
+
+
+
+		//draw texture wall
+		if (data->side == 0) wall_x = data->pos_y + data->perp_wall_dist * data->ray_dir_y;
+		else wall_x = data->pos_x + data->perp_wall_dist * data->ray_dir_x;
+
+		wall_x = wall_x - floor(wall_x);
+
+		//x coordinate on the texture
+		tex_x = (int)(wall_x * (double)tex_width);
+		if (data->side == 0 && data->ray_dir_x > 0) tex_x = tex_width - tex_x - 1;
+		if (data->side == 1 && data->ray_dir_y < 0) tex_x = tex_width - tex_x - 1;
+		y = draw_start;
+		if (draw_start < draw_end && draw_end >= 0 && draw_start >= 0)
+		{
+
+			while (y < draw_end)
+			{
+				d = y * 256 - WINHEIGHT * 128 + line_height * 128;
+				tex_y = ((d * tex_height) / line_height) / 256;
+
+				i = 0;
+				while (i < 3)
+				{
+					data->img->addr[y * data->img->line_length + x * data->img->bits_per_pixel / 8 + i] = \
+					data->loaded_texture->addr[tex_y * data->loaded_texture->line_length + tex_x * data->loaded_texture->bits_per_pixel / 8 + i];
+					i++;
+				}
+
+				y++;
+			}
+		}
+
+
+
+
 		//draw floor
 		if (draw_end < WINHEIGHT && draw_end >= 0) draw_vertical_line(data, x, draw_end, (WINHEIGHT), 0x00FF0000);
 
@@ -229,7 +387,12 @@ int	render_next_frame(t_data *data)
 
 
 	mlx_put_image_to_window(data->mlx->mlx, data->mlx->mlx_window, data->img->img, 0, 0);
-	print_map(data);
+	//mlx_sync(MLX_SYNC_WIN_FLUSH_CMD, data->mlx->mlx_window);
+	//mlx_sync(MLX_SYNC_WIN_CMD_COMPLETED, data->mlx->mlx_window);
+
+
+
+	printf("\ndir_x:%f, dir_y:%f\npos: %f, %f\n", data->dir_x, data->dir_y, data->pos_x, data->pos_y);
 	return (0);
 }
 
@@ -247,6 +410,10 @@ int	main(void)
 	data = malloc(sizeof(t_data));
 	data->mlx = malloc(sizeof(t_mlx_vars));
 	data->img = malloc(sizeof(t_img_data));
+	data->texture_1 = malloc(sizeof(t_img_data));
+	data->texture_2 = malloc(sizeof(t_img_data));
+	data->texture_3 = malloc(sizeof(t_img_data));
+	data->texture_4 = malloc(sizeof(t_img_data));
 
 	data->map = build_map();
 	print_map(data);
@@ -256,6 +423,31 @@ int	main(void)
 	data->mlx->mlx_window = mlx_new_window(data->mlx->mlx, WINWIDTH, WINHEIGHT, "cub3d");
 	data->img->img = mlx_new_image(data->mlx->mlx, WINWIDTH, WINHEIGHT);
 	data->img->addr = mlx_get_data_addr(data->img->img, &data->img->bits_per_pixel, &data->img->line_length, &data->img->endian);
+
+	//load_textures
+	data->texture_1->img = mlx_xpm_file_to_image(data->mlx->mlx, \
+	"./img/wall.xpm", &data->texture_1->width, \
+	&data->texture_1->height);
+	data->texture_1->addr = mlx_get_data_addr(data->texture_1->img, &data->texture_1->bits_per_pixel, &data->texture_1->line_length, &data->texture_1->endian);
+
+	data->texture_2->img = mlx_xpm_file_to_image(data->mlx->mlx, \
+	"./img/collect.xpm", &data->texture_2->width, \
+	&data->texture_2->height);
+	data->texture_2->addr = mlx_get_data_addr(data->texture_2->img, &data->texture_2->bits_per_pixel, &data->texture_2->line_length, &data->texture_2->endian);
+
+	data->texture_3->img = mlx_xpm_file_to_image(data->mlx->mlx, \
+	"./img/exit.xpm", &data->texture_3->width, \
+	&data->texture_3->height);
+	data->texture_3->addr = mlx_get_data_addr(data->texture_3->img, &data->texture_3->bits_per_pixel, &data->texture_3->line_length, &data->texture_3->endian);
+
+	data->texture_4->img = mlx_xpm_file_to_image(data->mlx->mlx, \
+	"./img/player.xpm", &data->texture_4->width, \
+	&data->texture_4->height);
+	data->texture_4->addr = mlx_get_data_addr(data->texture_4->img, &data->texture_4->bits_per_pixel, &data->texture_4->line_length, &data->texture_4->endian);
+
+	//mlx_sync main img
+	//mlx_sync(MLX_SYNC_IMAGE_WRITABLE, data->img->img);
+
 
 	//giving default position coordinates
 	data->pos_x = 22;
