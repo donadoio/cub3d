@@ -6,80 +6,24 @@
 /*   By: idonado <idonado@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/08/21 19:12:50 by idonado       #+#    #+#                 */
-/*   Updated: 2021/10/28 21:01:01 by idonado       ########   odam.nl         */
+/*   Updated: 2021/10/30 18:25:31 by idonado       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <cub3d.h>
 
-int	check_next_pos_up_x(t_data *data)
+void	rotate(t_data *data, double rotate_speed)
 {
-	int		temp_int;
-	float	temp_float;
-	float	value;
-	int		pos_next;
+	double	old_dir_x;
+	double	old_plane_x;
 
-	value = data->pos_x + data->dir_x * MOVE_SPEED;
-	temp_int = (int)value;
-	temp_float = value - (float)temp_int;
-	if (data->dir_x > 0)
-	{
-		pos_next = (int)data->pos_x + 1;
-	}
-	else
-	{
-		pos_next = (int)data->pos_x - 1;
-	}
-	if ((int)data->pos_x == (int)value && data->map[pos_next][(int)data->pos_y] == 1)
-	{
-		if (pos_next > (int)data->pos_x && temp_float > 0.75)
-		{
-			printf("Denied move up to x %f\n", value);
-			return (0);
-		}
-		else if (pos_next < (int)data->pos_x && temp_float < 0.25)
-		{
-			printf("Denied move up to x %f\n", value);
-			return (0);
-		}
-	}
-	return (1);
-}
-
-int	check_next_pos_up_y(t_data *data)
-{
-	int		temp_int;
-	float	temp_float;
-	float	value;
-	int		pos_next;
-
-	value = data->pos_y + data->dir_y * MOVE_SPEED;
-	temp_int = (int)value;
-	temp_float = value - (float)temp_int;
-	if (data->dir_y > 0)
-	{
-		printf("facing east?\n");
-		pos_next = (int)data->pos_y + 1;
-	}
-	else
-	{
-		printf("facing west?\n");
-		pos_next = (int)data->pos_y - 1;
-	}
-	if ((int)data->pos_y == (int)value && data->map[(int)data->pos_x][pos_next] == 1)
-	{
-		if (pos_next > (int)data->pos_y && temp_float > 0.75)
-		{
-			printf("Denied move up to y %f\n", value);
-			return (0);
-		}
-		else if (pos_next < (int)data->pos_y && temp_float < 0.25)
-		{
-			printf("Denied move up to y %f\n", value);
-			return (0);
-		}
-	}
-	return (1);
+	old_dir_x = data->dir_x;
+    data->dir_x = data->dir_x * cos(-rotate_speed) - data->dir_y * sin(-rotate_speed);
+    data->dir_y = old_dir_x * sin(-rotate_speed) + data->dir_y * cos(-rotate_speed);
+    old_plane_x = data->plane_x;
+    data->plane_x = data->plane_x * cos(-rotate_speed) - data->plane_y * sin(-rotate_speed);
+    data->plane_y = old_plane_x * sin(-rotate_speed) + data->plane_y * cos(-rotate_speed);
+	render_next_frame(data);
 }
 
 int	keypressed(int keycode, t_data	*data)
@@ -95,8 +39,8 @@ int	keypressed(int keycode, t_data	*data)
 	}
 	else if (keycode == DOWN_KEY)
 	{
-		if(data->map[(int)(data->pos_x - data->dir_x * MOVE_SPEED)][(int)(data->pos_y)] == 0) data->pos_x = data->pos_x - data->dir_x * MOVE_SPEED;
-    	if(data->map[(int)(data->pos_x)][(int)(data->pos_y - data->dir_y * MOVE_SPEED)] == 0) data->pos_y = data->pos_y - data->dir_y * MOVE_SPEED;
+		if(data->map[(int)(data->pos_x - data->dir_x * MOVE_SPEED)][(int)(data->pos_y)] == 0 && check_next_pos_down_x(data) == 1) data->pos_x = data->pos_x - data->dir_x * MOVE_SPEED;
+    	if(data->map[(int)(data->pos_x)][(int)(data->pos_y - data->dir_y * MOVE_SPEED)] == 0 && check_next_pos_down_y(data) == 1) data->pos_y = data->pos_y - data->dir_y * MOVE_SPEED;
 		render_next_frame(data);
 	}
 	else if (keycode == LEFT_KEY)
@@ -106,8 +50,8 @@ int	keypressed(int keycode, t_data	*data)
 
 		look_dir_x = data->dir_y;
 		look_dir_y = data->dir_x;
-		if (data->map[(int)(data->pos_x - look_dir_x * MOVE_SPEED)][(int)(data->pos_y)] == 0)data->pos_x -= look_dir_x * MOVE_SPEED;
-		if (data->map[(int)(data->pos_x)][(int)(data->pos_y + look_dir_y * MOVE_SPEED)] == 0)data->pos_y += look_dir_y * MOVE_SPEED;
+		if (data->map[(int)(data->pos_x - look_dir_x * MOVE_SPEED)][(int)(data->pos_y)] == 0 && check_next_pos_left_x(data) == 1)data->pos_x -= look_dir_x * MOVE_SPEED;
+		if (data->map[(int)(data->pos_x)][(int)(data->pos_y + look_dir_y * MOVE_SPEED)] == 0 && check_next_pos_left_y(data) == 1)data->pos_y += look_dir_y * MOVE_SPEED;
 		render_next_frame(data);
 	}
 	else if (keycode == RIGHT_KEY)
@@ -117,8 +61,8 @@ int	keypressed(int keycode, t_data	*data)
 
 		look_dir_x = data->dir_y;
 		look_dir_y = data->dir_x;
-		if (data->map[(int)(data->pos_x + look_dir_x * MOVE_SPEED)][(int)(data->pos_y)] == 0)data->pos_x += look_dir_x * MOVE_SPEED;
-		if (data->map[(int)(data->pos_x)][(int)(data->pos_y - look_dir_y * MOVE_SPEED)] == 0)data->pos_y -= look_dir_y * MOVE_SPEED;
+		if (data->map[(int)(data->pos_x + look_dir_x * MOVE_SPEED)][(int)(data->pos_y)] == 0 && check_next_pos_right_x(data) == 1)data->pos_x += look_dir_x * MOVE_SPEED;
+		if (data->map[(int)(data->pos_x)][(int)(data->pos_y - look_dir_y * MOVE_SPEED)] == 0 && check_next_pos_right_y(data) == 1)data->pos_y -= look_dir_y * MOVE_SPEED;
 		render_next_frame(data);
 	}
 	else if (keycode == LEFT_ROTATE)
@@ -145,6 +89,10 @@ int	keypressed(int keycode, t_data	*data)
 	}
 	else
 		printf("keycode=%d\n", keycode);
+	if (data->dir_x == 0 || data->dir_x == 1 || data->dir_x == -1 || data->dir_y == 0 || data->dir_y == 1 || data->dir_y == -1 )
+	{
+		rotate(data, 0.001);
+	}
 	return (0);
 }
 
@@ -392,7 +340,7 @@ int	render_next_frame(t_data *data)
 
 
 
-	printf("\ndir_x:%f, dir_y:%f\npos: %f, %f\n", data->dir_x, data->dir_y, data->pos_x, data->pos_y);
+	printf("\ndir_x:%f, dir_y:%f\nplane_x:%f, plane_y:%f\npos: %f, %f\n", data->dir_x, data->dir_y, data->plane_x, data->plane_y, data->pos_x, data->pos_y);
 	return (0);
 }
 
@@ -403,18 +351,45 @@ int	game_loop(t_data *data)
 	return (0);
 }
 
-int	main(void)
+static	void	arg_check(int argc, char **argv)
+{
+	size_t	arg_len;
+	char	*mapfile;
+
+	if (argc != 2)
+	{
+		printf("Error!\n Wrong number of arguments.\n");
+		exit(1);
+	}
+	arg_len = ft_strlen(argv[1]);
+	if (arg_len < 5)
+	{
+		printf("Error!\n Wrong map file format.\n");
+		exit(1);
+	}
+	mapfile = ft_substr(argv[1], arg_len - 4, 4);
+	if (ft_strncmp(mapfile, ".cub", 4) != 0)
+	{
+		printf("Error!\n Wrong map file format.\n");
+		free(mapfile);
+		exit(1);
+	}
+	free(mapfile);
+	return ;
+}
+
+int	main(int argc, char **argv)
 {
 	t_data	*data;
 	
+	arg_check(argc, argv);
 	data = malloc(sizeof(t_data));
-	data->mlx = malloc(sizeof(t_mlx_vars));
-	data->img = malloc(sizeof(t_img_data));
-	data->texture_1 = malloc(sizeof(t_img_data));
-	data->texture_2 = malloc(sizeof(t_img_data));
-	data->texture_3 = malloc(sizeof(t_img_data));
-	data->texture_4 = malloc(sizeof(t_img_data));
+	if (data == NULL)
+		return (1);
+	if (!structs_init(data))
+		return (1);
 
+	// temp map builder
 	data->map = build_map();
 	print_map(data);
 
@@ -461,6 +436,32 @@ int	main(void)
 	data->plane_x = 0;
 	data->plane_y = 0.66;
 
+	//look south
+	//if (argc == 2)
+	//{
+	//	data->dir_x = 1;
+	//	data->plane_y = -0.66;
+	//}
+	////look east
+	//if (argc == 3)
+	//{
+	//	data->dir_x = 0;
+	//	data->dir_y = 1;
+	//	data->plane_y = 0;
+	//	data->plane_x = 0.66;
+	//}
+	////look west
+	//if (argc == 4)
+	//{
+	//	data->dir_x = 0;
+	//	data->dir_y = -1;
+	//	data->plane_y = 0;
+	//	data->plane_x = -0.66;
+	//}
+
+
+	//rotate a bit so it's never exactly at dir_x 1 or dir_y 1
+	rotate(data, 0.001);
 
 	// key hooks and game loop
 	mlx_hook(data->mlx->mlx_window, 2, 1L << 0, keypressed, data);
