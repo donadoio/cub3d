@@ -6,7 +6,7 @@
 /*   By: idonado <idonado@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/08/21 19:12:50 by idonado       #+#    #+#                 */
-/*   Updated: 2021/10/28 21:01:01 by idonado       ########   odam.nl         */
+/*   Updated: 2021/10/29 23:22:23 by idonado       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,8 @@ int	keypressed(int keycode, t_data	*data)
 
 		look_dir_x = data->dir_y;
 		look_dir_y = data->dir_x;
-		if (data->map[(int)(data->pos_x - look_dir_x * MOVE_SPEED)][(int)(data->pos_y)] == 0)data->pos_x -= look_dir_x * MOVE_SPEED;
-		if (data->map[(int)(data->pos_x)][(int)(data->pos_y + look_dir_y * MOVE_SPEED)] == 0)data->pos_y += look_dir_y * MOVE_SPEED;
+		if (data->map[(int)(data->pos_x - look_dir_x * MOVE_SPEED)][(int)(data->pos_y)] == 0 && check_next_pos_left_x(data) == 1)data->pos_x -= look_dir_x * MOVE_SPEED;
+		if (data->map[(int)(data->pos_x)][(int)(data->pos_y + look_dir_y * MOVE_SPEED)] == 0 && check_next_pos_left_y(data) == 1)data->pos_y += look_dir_y * MOVE_SPEED;
 		render_next_frame(data);
 	}
 	else if (keycode == RIGHT_KEY)

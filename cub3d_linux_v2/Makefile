@@ -3,7 +3,8 @@ NAME = cub3d
 SRC =	main.c\
 		console.c\
 		graphics.c\
-		wall_collision.c
+		wall_collision_a.c\
+		wall_collision_b.c
 
 SRC_MAP = srcs/
 
