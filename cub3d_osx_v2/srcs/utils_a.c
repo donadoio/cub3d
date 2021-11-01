@@ -6,7 +6,7 @@
 /*   By: idonado <idonado@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/11/01 16:56:17 by idonado       #+#    #+#                 */
-/*   Updated: 2021/11/01 19:08:10 by idonado       ########   odam.nl         */
+/*   Updated: 2021/11/01 20:11:40 by idonado       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ void	free_split(char **words)
 		free(words[i]);
 		i++;
 	}
+	free(words[i]);
 	free(words);
 	return ;
 }
