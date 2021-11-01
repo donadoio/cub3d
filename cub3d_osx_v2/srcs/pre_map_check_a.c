@@ -6,7 +6,7 @@
 /*   By: idonado <idonado@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/11/01 17:32:21 by idonado       #+#    #+#                 */
-/*   Updated: 2021/11/01 20:08:06 by idonado       ########   odam.nl         */
+/*   Updated: 2021/11/01 20:18:24 by idonado       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,8 @@ void	check_ceiling_floor(t_data *data, int *action)
 	if (*temp == 'C')
 	{
 		temp++;
+		if (*temp != ' ')
+			invalid_line_exit(data, "Error: Invalid line on RGB color for ceiling.");
 		while (*temp == ' ')
 			temp++;
 		if (ft_isdigit(*temp))
@@ -94,6 +96,8 @@ void	check_ceiling_floor(t_data *data, int *action)
 	else if (*temp == 'F')
 	{
 		temp++;
+		if (*temp != ' ')
+			invalid_line_exit(data, "Error: Invalid line on RGB color for floor.");
 		while (*temp == ' ')
 			temp++;
 		if (ft_isdigit(*temp))
