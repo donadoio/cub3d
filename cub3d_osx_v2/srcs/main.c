@@ -6,7 +6,7 @@
 /*   By: idonado <idonado@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/08/21 19:12:50 by idonado       #+#    #+#                 */
-/*   Updated: 2021/10/30 18:25:31 by idonado       ########   odam.nl         */
+/*   Updated: 2021/11/01 19:48:53 by idonado       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,7 +141,6 @@ int	**build_map(void)
 
 int	render_next_frame(t_data *data)
 {
-
 
 	//used for line size calculation when drawing column by column
 	int line_height;
@@ -286,7 +285,7 @@ int	render_next_frame(t_data *data)
 
 	//printf("drawstart%d\ndrawend%d\n\n", draw_start, draw_end);
 		//draw roof
-		if (0 < draw_start && draw_start >= 0)draw_vertical_line(data, x, 0, draw_start, 0x00FFFFF0);
+		if (0 < draw_start && draw_start >= 0)draw_vertical_line(data, x, 0, draw_start, data->ceiling_color);
 
 
 
@@ -325,7 +324,7 @@ int	render_next_frame(t_data *data)
 
 
 		//draw floor
-		if (draw_end < WINHEIGHT && draw_end >= 0) draw_vertical_line(data, x, draw_end, (WINHEIGHT), 0x00FF0000);
+		if (draw_end < WINHEIGHT && draw_end >= 0) draw_vertical_line(data, x, draw_end, (WINHEIGHT), data->floor_color);
 
 		//color where it hits
 		my_mlx_pixel_put(data->img, x, draw_end, 0x00000000);
@@ -388,6 +387,7 @@ int	main(int argc, char **argv)
 		return (1);
 	if (!structs_init(data))
 		return (1);
+	map_check(argv, data);
 
 	// temp map builder
 	data->map = build_map();

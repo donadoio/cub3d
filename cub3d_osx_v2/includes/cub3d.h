@@ -6,7 +6,7 @@
 /*   By: idonado <idonado@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/08/21 18:38:26 by idonado       #+#    #+#                 */
-/*   Updated: 2021/10/30 18:04:57 by idonado       ########   odam.nl         */
+/*   Updated: 2021/11/01 18:59:42 by idonado       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,22 @@ typedef struct s_mlx_vars
 	void	*mlx_window;
 }				t_mlx_vars;
 
+typedef	struct s_parse_data
+{
+	int	map_fd;
+	int	main_img_set;
+	int	text_one_set;
+	int	text_two_set;
+	int	text_three_set;
+	int	text_four_set;
+	int	ceiling_set;
+	int	floor_set;
+	int	map_set;
+	int all_set;
+	char	*line;
+}				t_parse_data;
+
+
 typedef struct s_data
 {
 	t_mlx_vars	*mlx;
@@ -59,7 +75,10 @@ typedef struct s_data
 	t_img_data	*texture_3;
 	t_img_data	*texture_4;
 	t_img_data	*loaded_texture;
+	t_parse_data	parse_data;
 	int			**map;
+	int			ceiling_color;
+	int			floor_color;
 
 	// position and direction variables
 	double	pos_x;
@@ -115,7 +134,19 @@ typedef struct s_data
 void	print_map(t_data *data);
 
 //pre-processing stuff
-int	structs_init(t_data *data);
+void	pre_map_check(t_data *data);
+
+void	check_ceiling(t_data *data, int *action);
+
+void	map_check(char **argv, t_data *data);
+int		structs_init(t_data *data);
+int		delete_structs(t_data *data, int count);
+void	delete_and_destroy_all(t_data *data);
+
+void	free_split(char **words);
+int		ft_str_isnum(char *str);
+int		create_trgb(int t, int r, int g, int b);
+
 
 //wall collision checks
 int	check_next_pos_down_x(t_data *data);

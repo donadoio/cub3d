@@ -1,11 +1,8 @@
 NAME = cub3d
 
 SRC =	main.c\
-		pre_map_check_a.c\
-		pre_map_check_b.c\
 		map_check.c\
 		structs_init.c\
-		utils_a.c\
 		console.c\
 		graphics.c\
 		wall_collision_a.c\
