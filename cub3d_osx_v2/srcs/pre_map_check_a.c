@@ -6,7 +6,7 @@
 /*   By: idonado <idonado@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/11/01 17:32:21 by idonado       #+#    #+#                 */
-/*   Updated: 2021/11/01 19:56:04 by idonado       ########   odam.nl         */
+/*   Updated: 2021/11/01 20:08:06 by idonado       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,17 +83,13 @@ void	check_ceiling_floor(t_data *data, int *action)
 				data->ceiling_color = rgb_to_hex(temp);
 				data->parse_data.ceiling_set = 1;
 				*action = 1;
-				printf("Ceiling color: %x\n", data->ceiling_color);
 				return ;
 			}
 			else
-				invalid_line_exit(data, "Error: Invalid RGB color for ceiling. rgb_to_hex returned < 0?");
+				invalid_line_exit(data, "Error: Invalid line on RGB color for ceiling.");
 		}
 		else
-		{
-			printf("last char: %c\n", *temp);
-			invalid_line_exit(data, "Error: Invalid RGB color for ceiling, current char isn't a digit?");
-		}
+			invalid_line_exit(data, "Error: Invalid line on RGB color for ceiling.");
 	}
 	else if (*temp == 'F')
 	{
@@ -107,14 +103,13 @@ void	check_ceiling_floor(t_data *data, int *action)
 				data->floor_color = rgb_to_hex(temp);
 				data->parse_data.floor_set = 1;
 				*action = 1;
-				printf("Floor color: %x\n", data->floor_color);
 				return ;
 			}
 			else
 				invalid_line_exit(data, "Error: Invalid line on RGB color for floor.");
 		}
 		else
-			invalid_line_exit(data, "Error: Invalid line of RGB color for floor.");
+			invalid_line_exit(data, "Error: Invalid line on RGB color for floor.");
 	}
 	return ;	
 }
@@ -123,9 +118,8 @@ void	pre_map_check(t_data *data)
 {
 	int	action;
 
-	while (data->parse_data.all_set == 0)
+	while (data->parse_data.all_set == 0 && get_next_line(data->parse_data.map_fd, &data->parse_data.line) != 0)
 	{
-		get_next_line(data->parse_data.map_fd, &data->parse_data.line);
 		printf("Line-> %s\n", data->parse_data.line);
 
 
@@ -138,7 +132,7 @@ void	pre_map_check(t_data *data)
 			
 		if (action == 0 && data->parse_data.all_set == 0 && ft_strlen(data->parse_data.line) != 0)
 		{
-			printf("Error, garbage in mapfile.cub\n");
+			printf("Error, garbage or empty lines with spaces in mapfile.cub\n");
 			exit (0);
 		}
 		free(data->parse_data.line);
