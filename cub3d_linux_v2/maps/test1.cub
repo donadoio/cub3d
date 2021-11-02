@@ -1,0 +1,11 @@
+
+WE         ./textures/exit.xpm
+
+F    055,155,205
+    SO         ./textures/collect.xpm
+C    055,155,205
+
+    NO    ./textures/wall.xpm
+EA         ./textures/player.xpm
+
+

@@ -6,11 +6,25 @@
 /*   By: idonado <idonado@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/08/21 19:12:50 by idonado       #+#    #+#                 */
-/*   Updated: 2021/10/29 23:22:23 by idonado       ########   odam.nl         */
+/*   Updated: 2021/11/02 18:48:53 by idonado       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <cub3d.h>
+
+void	rotate(t_data *data, double rotate_speed)
+{
+	double	old_dir_x;
+	double	old_plane_x;
+
+	old_dir_x = data->dir_x;
+    data->dir_x = data->dir_x * cos(-rotate_speed) - data->dir_y * sin(-rotate_speed);
+    data->dir_y = old_dir_x * sin(-rotate_speed) + data->dir_y * cos(-rotate_speed);
+    old_plane_x = data->plane_x;
+    data->plane_x = data->plane_x * cos(-rotate_speed) - data->plane_y * sin(-rotate_speed);
+    data->plane_y = old_plane_x * sin(-rotate_speed) + data->plane_y * cos(-rotate_speed);
+	render_next_frame(data);
+}
 
 int	keypressed(int keycode, t_data	*data)
 {
@@ -47,8 +61,8 @@ int	keypressed(int keycode, t_data	*data)
 
 		look_dir_x = data->dir_y;
 		look_dir_y = data->dir_x;
-		if (data->map[(int)(data->pos_x + look_dir_x * MOVE_SPEED)][(int)(data->pos_y)] == 0)data->pos_x += look_dir_x * MOVE_SPEED;
-		if (data->map[(int)(data->pos_x)][(int)(data->pos_y - look_dir_y * MOVE_SPEED)] == 0)data->pos_y -= look_dir_y * MOVE_SPEED;
+		if (data->map[(int)(data->pos_x + look_dir_x * MOVE_SPEED)][(int)(data->pos_y)] == 0 && check_next_pos_right_x(data) == 1)data->pos_x += look_dir_x * MOVE_SPEED;
+		if (data->map[(int)(data->pos_x)][(int)(data->pos_y - look_dir_y * MOVE_SPEED)] == 0 && check_next_pos_right_y(data) == 1)data->pos_y -= look_dir_y * MOVE_SPEED;
 		render_next_frame(data);
 	}
 	else if (keycode == LEFT_ROTATE)
@@ -75,6 +89,10 @@ int	keypressed(int keycode, t_data	*data)
 	}
 	else
 		printf("keycode=%d\n", keycode);
+	if (data->dir_x == 0 || data->dir_x == 1 || data->dir_x == -1 || data->dir_y == 0 || data->dir_y == 1 || data->dir_y == -1 )
+	{
+		rotate(data, 0.001);
+	}
 	return (0);
 }
 
@@ -124,7 +142,6 @@ int	**build_map(void)
 int	render_next_frame(t_data *data)
 {
 
-
 	//used for line size calculation when drawing column by column
 	int line_height;
     //calculate lowest and highest pixel to fill in current stripe
@@ -137,8 +154,6 @@ int	render_next_frame(t_data *data)
 
 	//for wall texture stuff
 	//calculate value of wallX
-	int	tex_width = 1000;
-	int	tex_height = 1000;
     double wall_x; //where exactly the wall was hit
     //x coordinate on the texture
     int tex_x;
@@ -268,7 +283,7 @@ int	render_next_frame(t_data *data)
 
 	//printf("drawstart%d\ndrawend%d\n\n", draw_start, draw_end);
 		//draw roof
-		if (0 < draw_start && draw_start >= 0)draw_vertical_line(data, x, 0, draw_start, 0x00FFFFF0);
+		if (0 < draw_start && draw_start >= 0)draw_vertical_line(data, x, 0, draw_start, data->ceiling_color);
 
 
 
@@ -279,9 +294,9 @@ int	render_next_frame(t_data *data)
 		wall_x = wall_x - floor(wall_x);
 
 		//x coordinate on the texture
-		tex_x = (int)(wall_x * (double)tex_width);
-		if (data->side == 0 && data->ray_dir_x > 0) tex_x = tex_width - tex_x - 1;
-		if (data->side == 1 && data->ray_dir_y < 0) tex_x = tex_width - tex_x - 1;
+		tex_x = (int)(wall_x * (double)data->loaded_texture->width);
+		if (data->side == 0 && data->ray_dir_x > 0) tex_x = data->loaded_texture->width - tex_x - 1;
+		if (data->side == 1 && data->ray_dir_y < 0) tex_x = data->loaded_texture->width - tex_x - 1;
 		y = draw_start;
 		if (draw_start < draw_end && draw_end >= 0 && draw_start >= 0)
 		{
@@ -289,7 +304,7 @@ int	render_next_frame(t_data *data)
 			while (y < draw_end)
 			{
 				d = y * 256 - WINHEIGHT * 128 + line_height * 128;
-				tex_y = ((d * tex_height) / line_height) / 256;
+				tex_y = ((d * data->loaded_texture->height) / line_height) / 256;
 
 				i = 0;
 				while (i < 3)
@@ -307,7 +322,7 @@ int	render_next_frame(t_data *data)
 
 
 		//draw floor
-		if (draw_end < WINHEIGHT && draw_end >= 0) draw_vertical_line(data, x, draw_end, (WINHEIGHT), 0x00FF0000);
+		if (draw_end < WINHEIGHT && draw_end >= 0) draw_vertical_line(data, x, draw_end, (WINHEIGHT), data->floor_color);
 
 		//color where it hits
 		my_mlx_pixel_put(data->img, x, draw_end, 0x00000000);
@@ -322,7 +337,7 @@ int	render_next_frame(t_data *data)
 
 
 
-	printf("\ndir_x:%f, dir_y:%f\npos: %f, %f\n", data->dir_x, data->dir_y, data->pos_x, data->pos_y);
+	printf("\ndir_x:%f, dir_y:%f\nplane_x:%f, plane_y:%f\npos: %f, %f\n", data->dir_x, data->dir_y, data->plane_x, data->plane_y, data->pos_x, data->pos_y);
 	return (0);
 }
 
@@ -333,64 +348,98 @@ int	game_loop(t_data *data)
 	return (0);
 }
 
-int	main(void)
+static	void	arg_check(int argc, char **argv)
+{
+	size_t	arg_len;
+	char	*mapfile;
+
+	if (argc != 2)
+	{
+		printf("Error!\n Wrong number of arguments.\n");
+		exit(1);
+	}
+	arg_len = ft_strlen(argv[1]);
+	if (arg_len < 5)
+	{
+		printf("Error!\n Wrong map file format.\n");
+		exit(1);
+	}
+	mapfile = ft_substr(argv[1], arg_len - 4, 4);
+	if (ft_strncmp(mapfile, ".cub", 4) != 0)
+	{
+		printf("Error!\n Wrong map file format.\n");
+		free(mapfile);
+		exit(1);
+	}
+	free(mapfile);
+	return ;
+}
+
+int	main(int argc, char **argv)
 {
 	t_data	*data;
 	
+	arg_check(argc, argv);
 	data = malloc(sizeof(t_data));
-	data->mlx = malloc(sizeof(t_mlx_vars));
-	data->img = malloc(sizeof(t_img_data));
-	data->texture_1 = malloc(sizeof(t_img_data));
-	data->texture_2 = malloc(sizeof(t_img_data));
-	data->texture_3 = malloc(sizeof(t_img_data));
-	data->texture_4 = malloc(sizeof(t_img_data));
+	if (data == NULL)
+		return (1);
+	if (!structs_init(data))
+		return (1);
 
-	data->map = build_map();
-	print_map(data);
 
 	//initializing mlx and image
 	data->mlx->mlx = mlx_init();
 	data->mlx->mlx_window = mlx_new_window(data->mlx->mlx, WINWIDTH, WINHEIGHT, "cub3d");
 	data->img->img = mlx_new_image(data->mlx->mlx, WINWIDTH, WINHEIGHT);
 	data->img->addr = mlx_get_data_addr(data->img->img, &data->img->bits_per_pixel, &data->img->line_length, &data->img->endian);
+	data->parse_data.main_img_set = 1;
 
-	//load_textures
-	data->texture_1->img = mlx_xpm_file_to_image(data->mlx->mlx, \
-	"./img/wall.xpm", &data->texture_1->width, \
-	&data->texture_1->height);
-	data->texture_1->addr = mlx_get_data_addr(data->texture_1->img, &data->texture_1->bits_per_pixel, &data->texture_1->line_length, &data->texture_1->endian);
+	map_check_init(argv, data);
+	
+	// temp map builder
+	// data->map = build_map();
+	// print_map(data);
 
-	data->texture_2->img = mlx_xpm_file_to_image(data->mlx->mlx, \
-	"./img/collect.xpm", &data->texture_2->width, \
-	&data->texture_2->height);
-	data->texture_2->addr = mlx_get_data_addr(data->texture_2->img, &data->texture_2->bits_per_pixel, &data->texture_2->line_length, &data->texture_2->endian);
-
-	data->texture_3->img = mlx_xpm_file_to_image(data->mlx->mlx, \
-	"./img/exit.xpm", &data->texture_3->width, \
-	&data->texture_3->height);
-	data->texture_3->addr = mlx_get_data_addr(data->texture_3->img, &data->texture_3->bits_per_pixel, &data->texture_3->line_length, &data->texture_3->endian);
-
-	data->texture_4->img = mlx_xpm_file_to_image(data->mlx->mlx, \
-	"./img/player.xpm", &data->texture_4->width, \
-	&data->texture_4->height);
-	data->texture_4->addr = mlx_get_data_addr(data->texture_4->img, &data->texture_4->bits_per_pixel, &data->texture_4->line_length, &data->texture_4->endian);
-
-	//mlx_sync main img
-	//mlx_sync(MLX_SYNC_IMAGE_WRITABLE, data->img->img);
 
 
 	//giving default position coordinates
-	data->pos_x = 22;
-	data->pos_y = 12;
+	//data->pos_x = 22;
+	//data->pos_y = 12;
 
 	//direction coordinate
-	data->dir_x = -1;
-	data->dir_y = 0;
+	//data->dir_x = -1;
+	//data->dir_y = 0;
+//
+	////camera plane
+	//data->plane_x = 0;
+	//data->plane_y = 0.66;
 
-	//camera plane
-	data->plane_x = 0;
-	data->plane_y = 0.66;
+	//look south
+	//if (argc == 2)
+	//{
+	//	data->dir_x = 1;
+	//	data->plane_y = -0.66;
+	//}
+	////look east
+	//if (argc == 3)
+	//{
+	//	data->dir_x = 0;
+	//	data->dir_y = 1;
+	//	data->plane_y = 0;
+	//	data->plane_x = 0.66;
+	//}
+	////look west
+	//if (argc == 4)
+	//{
+	//	data->dir_x = 0;
+	//	data->dir_y = -1;
+	//	data->plane_y = 0;
+	//	data->plane_x = -0.66;
+	//}
 
+
+	//rotate a bit so it's never exactly at dir_x 1 or dir_y 1
+	rotate(data, 0.001);
 
 	// key hooks and game loop
 	mlx_hook(data->mlx->mlx_window, 2, 1L << 0, keypressed, data);

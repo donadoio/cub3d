@@ -6,7 +6,7 @@
 /*   By: idonado <idonado@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/08/21 18:38:26 by idonado       #+#    #+#                 */
-/*   Updated: 2021/10/29 23:22:45 by idonado       ########   odam.nl         */
+/*   Updated: 2021/11/02 21:52:16 by idonado       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,23 @@ typedef struct s_mlx_vars
 	void	*mlx_window;
 }				t_mlx_vars;
 
+typedef	struct s_parse_data
+{
+	int	map_fd;
+	int	direction_set;
+	int	main_img_set;
+	int	text_one_set;
+	int	text_two_set;
+	int	text_three_set;
+	int	text_four_set;
+	int	ceiling_set;
+	int	floor_set;
+	int	map_set;
+	int all_set;
+	char	*line;
+}				t_parse_data;
+
+
 typedef struct s_data
 {
 	t_mlx_vars	*mlx;
@@ -59,7 +76,13 @@ typedef struct s_data
 	t_img_data	*texture_3;
 	t_img_data	*texture_4;
 	t_img_data	*loaded_texture;
+	t_parse_data	parse_data;
 	int			**map;
+	int			map_begin;
+	int			map_height;
+	int			map_width;
+	int			ceiling_color;
+	int			floor_color;
 
 	// position and direction variables
 	double	pos_x;
@@ -114,13 +137,40 @@ typedef struct s_data
 //console stuff
 void	print_map(t_data *data);
 
-//grid_check
-int	check_next_pos_up_x(t_data *data);
-int	check_next_pos_up_y(t_data *data);
+//pre-processing stuff
+void	map_check_init(char **argv, t_data *data);
+void	pre_map_check(t_data *data);
+void	grab_map(char **argv, t_data *data);
+void	invalid_line_exit(t_data *data, char *msg, int free_line);
+void	check_ceiling(t_data *data, int *action);
+void	check_north(t_data *data, int *action);
+void	check_south(t_data *data, int *action);
+void	check_west(t_data *data, int *action);
+void	check_east(t_data *data, int *action);
+int		structs_init(t_data *data);
+int		delete_structs(t_data *data, int count);
+void	delete_and_destroy_all(t_data *data);
+void	check_map_filepath(char **argv, t_data *data);
+
+void	exit_delete_map(t_data *data, int last, int free_line);
+
+void	handle_temp_alloc_fail(t_data *data, int **tempmap, int i, int flag);void	free_tempmap(t_data *data, int **tempmap);
+int		**fill_map_check(t_data *data, int **tempmap, int i, int j);void		check_map(t_data *data);
+
+void	free_split(char **words);
+int		ft_str_isnum(char *str);
+int		create_trgb(int t, int r, int g, int b);
+
+
+//wall collision checks
 int	check_next_pos_down_x(t_data *data);
 int	check_next_pos_down_y(t_data *data);
+int	check_next_pos_up_x(t_data *data);
+int	check_next_pos_up_y(t_data *data);
 int	check_next_pos_left_x(t_data *data);
 int	check_next_pos_left_y(t_data *data);
+int	check_next_pos_right_x(t_data *data);
+int	check_next_pos_right_y(t_data *data);
 
 //Graphic stuff
 void	my_mlx_pixel_put(t_img_data *data, int x, int y, int color);
