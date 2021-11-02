@@ -1,0 +1,16 @@
+R 640 480
+
+11111111111111111111111111
+1                        1
+1          N             1
+1                        1
+11111111111111111111111111
+
+NO ./textures/bluestone.xpm
+SO ./textures/eagle.xpm
+WE ./textures/greystone.xpm
+EA ./textures/purplestone.xpm
+S ./textures/pillar.xpm
+
+F 0,33,33
+C 0,0,255

@@ -6,7 +6,7 @@
 /*   By: idonado <idonado@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/08/21 18:38:26 by idonado       #+#    #+#                 */
-/*   Updated: 2021/11/01 18:59:42 by idonado       ########   odam.nl         */
+/*   Updated: 2021/11/02 19:17:26 by idonado       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ typedef struct s_mlx_vars
 typedef	struct s_parse_data
 {
 	int	map_fd;
+	int	direction_set;
 	int	main_img_set;
 	int	text_one_set;
 	int	text_two_set;
@@ -77,6 +78,9 @@ typedef struct s_data
 	t_img_data	*loaded_texture;
 	t_parse_data	parse_data;
 	int			**map;
+	int			map_begin;
+	int			map_height;
+	int			map_width;
 	int			ceiling_color;
 	int			floor_color;
 
@@ -134,14 +138,19 @@ typedef struct s_data
 void	print_map(t_data *data);
 
 //pre-processing stuff
+void	map_check_init(char **argv, t_data *data);
 void	pre_map_check(t_data *data);
-
+void	grab_map(char **argv, t_data *data);
+void	invalid_line_exit(t_data *data, char *msg, int free_line);
 void	check_ceiling(t_data *data, int *action);
-
-void	map_check(char **argv, t_data *data);
+void	check_north(t_data *data, int *action);
+void	check_south(t_data *data, int *action);
+void	check_west(t_data *data, int *action);
+void	check_east(t_data *data, int *action);
 int		structs_init(t_data *data);
 int		delete_structs(t_data *data, int count);
 void	delete_and_destroy_all(t_data *data);
+void	check_map_filepath(char **argv, t_data *data);
 
 void	free_split(char **words);
 int		ft_str_isnum(char *str);

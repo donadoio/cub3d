@@ -6,19 +6,21 @@
 /*   By: idonado <idonado@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/11/01 17:32:21 by idonado       #+#    #+#                 */
-/*   Updated: 2021/11/01 20:18:24 by idonado       ########   odam.nl         */
+/*   Updated: 2021/11/02 19:19:05 by idonado       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <cub3d.h>
 
-void	invalid_line_exit(t_data *data, char *msg)
+void	invalid_line_exit(t_data *data, char *msg, int free_line)
 {
 	if (msg != NULL)
 		printf("%s\n", msg);
-	free(data->parse_data.line);
+	if (free_line)
+		free(data->parse_data.line);
 	close(data->parse_data.map_fd);
 	delete_and_destroy_all(data);
+	system("leaks cub3d");
 	exit (1);
 }
 
@@ -64,7 +66,7 @@ int	rgb_to_hex(char *decimals)
 		return (create_trgb(0, r, g, b));
 }
 
-void	check_ceiling_floor(t_data *data, int *action)
+void	check_ceiling(t_data *data, int *action)
 {
 	char	*temp;
 
@@ -75,7 +77,7 @@ void	check_ceiling_floor(t_data *data, int *action)
 	{
 		temp++;
 		if (*temp != ' ')
-			invalid_line_exit(data, "Error: Invalid line on RGB color for ceiling.");
+			invalid_line_exit(data, "Error: Invalid line on RGB color for ceiling.", 1);
 		while (*temp == ' ')
 			temp++;
 		if (ft_isdigit(*temp))
@@ -88,16 +90,26 @@ void	check_ceiling_floor(t_data *data, int *action)
 				return ;
 			}
 			else
-				invalid_line_exit(data, "Error: Invalid line on RGB color for ceiling.");
+				invalid_line_exit(data, "Error: Invalid line on RGB color for ceiling.", 1);
 		}
 		else
-			invalid_line_exit(data, "Error: Invalid line on RGB color for ceiling.");
+			invalid_line_exit(data, "Error: Invalid line on RGB color for ceiling.", 1);
 	}
-	else if (*temp == 'F')
+	return ;	
+}
+
+void	check_floor(t_data *data, int *action)
+{
+	char	*temp;
+
+	temp = data->parse_data.line;
+	while (*temp == ' ')
+		temp++;
+	if (*temp == 'F')
 	{
 		temp++;
 		if (*temp != ' ')
-			invalid_line_exit(data, "Error: Invalid line on RGB color for floor.");
+			invalid_line_exit(data, "Error: Invalid line on RGB color for floor.", 1);
 		while (*temp == ' ')
 			temp++;
 		if (ft_isdigit(*temp))
@@ -110,12 +122,12 @@ void	check_ceiling_floor(t_data *data, int *action)
 				return ;
 			}
 			else
-				invalid_line_exit(data, "Error: Invalid line on RGB color for floor.");
+				invalid_line_exit(data, "Error: Invalid line on RGB color for floor.", 1);
 		}
 		else
-			invalid_line_exit(data, "Error: Invalid line on RGB color for floor.");
+			invalid_line_exit(data, "Error: Invalid line on RGB color for floor.", 1);
 	}
-	return ;	
+	return ;
 }
 
 void	pre_map_check(t_data *data)
@@ -128,20 +140,31 @@ void	pre_map_check(t_data *data)
 
 
 		action = 0;	
-		if (ft_strlen(data->parse_data.line) != 0 && (data->parse_data.ceiling_set == 0 || data->parse_data.floor_set == 0))
-			check_ceiling_floor(data, &action);
-
-		if (data->parse_data.ceiling_set == 1 && data->parse_data.floor_set == 1)
+		if (ft_strlen(data->parse_data.line) != 0 && data->parse_data.ceiling_set == 0)
+			check_ceiling(data, &action);
+		if (ft_strlen(data->parse_data.line) != 0 && data->parse_data.floor_set == 0)
+			check_floor(data, &action);
+		if (ft_strlen(data->parse_data.line) != 0 && data->parse_data.text_one_set == 0)
+			check_north(data, &action);
+		if (ft_strlen(data->parse_data.line) != 0 && data->parse_data.text_two_set == 0)
+			check_south(data, &action);
+		if (ft_strlen(data->parse_data.line) != 0 && data->parse_data.text_three_set == 0)
+			check_west(data, &action);
+		if (ft_strlen(data->parse_data.line) != 0 && data->parse_data.text_four_set == 0)
+			check_east(data, &action);
+		data->map_begin++;
+		if (data->parse_data.ceiling_set == 1 && data->parse_data.floor_set == 1 && data->parse_data.text_one_set == 1 && data->parse_data.text_two_set == 1 && data->parse_data.text_three_set == 1 && data->parse_data.text_four_set == 1)
 			data->parse_data.all_set = 1;
 			
 		if (action == 0 && data->parse_data.all_set == 0 && ft_strlen(data->parse_data.line) != 0)
 		{
-			printf("Error, garbage or empty lines with spaces in mapfile.cub\n");
+			printf("Error, garbage or extra info or empty lines with spaces in mapfile.cub\n");
 			exit (0);
 		}
 		free(data->parse_data.line);
-		if (data->parse_data.all_set == 1)
-			return ;
 	}
-	free(data->parse_data.line);
+	if (data->parse_data.all_set != 1)
+		invalid_line_exit(data, "Invalid or incomplete data in map file.", 1);
+	else
+		get_next_line(data->parse_data.map_fd, &data->parse_data.line);
 }

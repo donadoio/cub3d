@@ -6,7 +6,7 @@
 /*   By: idonado <idonado@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/10/30 18:04:11 by idonado       #+#    #+#                 */
-/*   Updated: 2021/11/01 17:06:47 by idonado       ########   odam.nl         */
+/*   Updated: 2021/11/02 17:59:53 by idonado       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@ static void	parse_data_init(t_data *data)
 	data->parse_data.floor_set = 0;
 	data->parse_data.map_set = 0;
 	data->parse_data.all_set = 0;
+	data->parse_data.direction_set = 0;
+	data->map_begin = 0;
 }
 
 int	structs_init(t_data *data)

@@ -3,7 +3,8 @@ NAME = cub3d
 SRC =	main.c\
 		pre_map_check_a.c\
 		pre_map_check_b.c\
-		map_check.c\
+		map_check_a.c\
+		map_check_b.c\
 		structs_init.c\
 		utils_a.c\
 		console.c\
@@ -15,7 +16,7 @@ SRC_MAP = srcs/
 
 SRCS = $(addprefix $(SRC_MAP), $(SRC))
 
-FLAGS = -Wall -Werror -Wextra -fsanitize=address
+FLAGS = -Wall -Werror -Wextra
 
 MLX_FLAGS = -lm -Lmlx -framework OpenGL -framework AppKit -lm -g
 
