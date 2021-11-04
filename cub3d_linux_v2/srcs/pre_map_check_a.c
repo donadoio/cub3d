@@ -6,7 +6,7 @@
 /*   By: idonado <idonado@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/11/01 17:32:21 by idonado       #+#    #+#                 */
-/*   Updated: 2021/11/02 19:19:05 by idonado       ########   odam.nl         */
+/*   Updated: 2021/11/03 16:17:38 by idonado       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,6 @@ int	rgb_to_hex(char *decimals)
 	{
 		if (ft_str_isnum(rgb[i]) == 0)
 		{
-			printf("r g or b isn't a number?\n");
 			free_split(rgb);
 			return (-1);
 		}
@@ -51,17 +50,13 @@ int	rgb_to_hex(char *decimals)
 		if (ft_atoi(rgb[i]) < 0 || ft_atoi(rgb[i]) > 255)
 		{
 			free_split(rgb);
-			printf("smaller tahn 0 or bigger than 255?\n");
 			return (-1);
 		}
 		i++;
 	}
 	free_split(rgb);
 	if (i != 3)
-	{
-		printf("splitted more than 3?\n");
 		return (-1);
-	}
 	else
 		return (create_trgb(0, r, g, b));
 }
@@ -158,7 +153,7 @@ void	pre_map_check(t_data *data)
 			
 		if (action == 0 && data->parse_data.all_set == 0 && ft_strlen(data->parse_data.line) != 0)
 		{
-			printf("Error, garbage or extra info or empty lines with spaces in mapfile.cub\n");
+			invalid_line_exit(data, "Error, garbage or extra info or empty lines with spaces in mapfile.cub", 1);
 			exit (0);
 		}
 		free(data->parse_data.line);
