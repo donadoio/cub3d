@@ -6,7 +6,7 @@
 /*   By: idonado <idonado@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/11/01 16:13:36 by idonado       #+#    #+#                 */
-/*   Updated: 2021/11/02 21:53:20 by idonado       ########   odam.nl         */
+/*   Updated: 2021/11/03 18:28:41 by idonado       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ int	is_mapline(char *str)
 
 void	get_map_height(t_data *data)
 {
-	int gnl_return;
+	int	gnl_return;
 
 	data->map_height = 0;
 	data->map_width = (int)ft_strlen(data->parse_data.line);
@@ -54,7 +54,8 @@ void	get_map_height(t_data *data)
 	while (is_mapline(data->parse_data.line))
 	{
 		free(data->parse_data.line);
-		gnl_return = get_next_line(data->parse_data.map_fd, &data->parse_data.line);
+		gnl_return = get_next_line(data->parse_data.map_fd, \
+&data->parse_data.line);
 		if ((int)ft_strlen(data->parse_data.line) > data->map_width)
 			data->map_width = (int)ft_strlen(data->parse_data.line);
 		data->map_height++;
@@ -62,9 +63,11 @@ void	get_map_height(t_data *data)
 	while (gnl_return != 0)
 	{
 		free(data->parse_data.line);
-		gnl_return = get_next_line(data->parse_data.map_fd, &data->parse_data.line);
+		gnl_return = get_next_line(data->parse_data.map_fd, \
+&data->parse_data.line);
 		if (ft_strlen(data->parse_data.line) != 0)
-			invalid_line_exit(data, "Garbage or non-empty lines after unverified map.", 1);
+			invalid_line_exit(data, "Garbage \
+or non-empty lines after unverified map.", 1);
 	}
 	free(data->parse_data.line);
 	return ;
@@ -72,7 +75,7 @@ void	get_map_height(t_data *data)
 
 void	grab_map_height(t_data *data)
 {
-	int gnl_return;
+	int	gnl_return;
 
 	gnl_return = 1;
 	data->map_height = 0;
@@ -81,11 +84,13 @@ void	grab_map_height(t_data *data)
 	else
 	{
 		data->map_begin++;
-		while (!is_mapline(data->parse_data.line) && gnl_return != 0 && ft_strlen(data->parse_data.line) == 0)
+		while (!is_mapline(data->parse_data.line) && \
+gnl_return != 0 && ft_strlen(data->parse_data.line) == 0)
 		{
 			data->map_begin++;
 			free(data->parse_data.line);
-			gnl_return = get_next_line(data->parse_data.map_fd, &data->parse_data.line);
+			gnl_return = get_next_line(data->parse_data.map_fd, \
+&data->parse_data.line);
 		}
 		if (gnl_return == 0)
 			invalid_line_exit(data, "Missing map in mapfile.cub", 1);
@@ -93,7 +98,6 @@ void	grab_map_height(t_data *data)
 			get_map_height(data);
 	}
 	close(data->parse_data.map_fd);
-	printf("Map height: %d\nMapBegins on line: %d\n", data->map_height, data->map_begin);
 	return ;
 }
 

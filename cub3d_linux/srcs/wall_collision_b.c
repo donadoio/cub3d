@@ -6,7 +6,7 @@
 /*   By: idonado <idonado@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/10/29 20:52:02 by idonado       #+#    #+#                 */
-/*   Updated: 2021/10/30 16:44:51 by idonado       ########   odam.nl         */
+/*   Updated: 2021/11/03 19:24:27 by idonado       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,26 +25,16 @@ int	check_next_pos_left_x(t_data *data)
 	temp_int = (int)value;
 	temp_float = value - (double)temp_int;
 	if (look_dir_x < 0)
-	{
 		pos_next = (int)data->pos_x + 1;
-	}
 	else
-	{
 		pos_next = (int)data->pos_x - 1;
-	}
-	if ((int)data->pos_x == (int)value && data->map[pos_next][(int)data->pos_y] == 1)
+	if ((int)data->pos_x == (int)value && \
+data->map[pos_next][(int)data->pos_y] == 1)
 	{
-		printf("Near wall \n");
-		if (pos_next > (int)data->pos_x && temp_float > 0.75)
-		{
-			printf("Denied move up to x %f\n", value);
+		if (pos_next > (int)data->pos_x && temp_float > 0.90)
 			return (0);
-		}
-		else if (pos_next < (int)data->pos_x && temp_float < 0.25)
-		{
-			printf("Denied move up to x %f\n", value);
+		else if (pos_next < (int)data->pos_x && temp_float < 0.10)
 			return (0);
-		}
 	}
 	return (1);
 }
@@ -62,27 +52,16 @@ int	check_next_pos_left_y(t_data *data)
 	temp_int = (int)value;
 	temp_float = value - (double)temp_int;
 	if (look_dir_y < 0)
-	{
-		printf("facing east?\n");
 		pos_next = (int)data->pos_y - 1;
-	}
 	else
-	{
-		printf("facing west?\n");
 		pos_next = (int)data->pos_y + 1;
-	}
-	if ((int)data->pos_y == (int)value && data->map[(int)data->pos_x][pos_next] == 1)
+	if ((int)data->pos_y == (int)value && \
+data->map[(int)data->pos_x][pos_next] == 1)
 	{
-		if (pos_next > (int)data->pos_y && temp_float > 0.75)
-		{
-			printf("Denied move up to y %f\n", value);
+		if (pos_next > (int)data->pos_y && temp_float > 0.90)
 			return (0);
-		}
-		else if (pos_next < (int)data->pos_y && temp_float < 0.25)
-		{
-			printf("Denied move up to y %f\n", value);
+		else if (pos_next < (int)data->pos_y && temp_float < 0.10)
 			return (0);
-		}
 	}
 	return (1);
 }
@@ -100,26 +79,16 @@ int	check_next_pos_right_x(t_data *data)
 	temp_int = (int)value;
 	temp_float = value - (double)temp_int;
 	if (look_dir_x < 0)
-	{
 		pos_next = (int)data->pos_x - 1;
-	}
 	else
-	{
 		pos_next = (int)data->pos_x + 1;
-	}
-	if ((int)data->pos_x == (int)value && data->map[pos_next][(int)data->pos_y] == 1)
+	if ((int)data->pos_x == (int)value && \
+data->map[pos_next][(int)data->pos_y] == 1)
 	{
-		printf("Near wall \n");
-		if (pos_next > (int)data->pos_x && temp_float > 0.75)
-		{
-			printf("Denied move up to x %f\n", value);
+		if (pos_next > (int)data->pos_x && temp_float > 0.90)
 			return (0);
-		}
-		else if (pos_next < (int)data->pos_x && temp_float < 0.25)
-		{
-			printf("Denied move up to x %f\n", value);
+		else if (pos_next < (int)data->pos_x && temp_float < 0.10)
 			return (0);
-		}
 	}
 	return (1);
 }
@@ -137,27 +106,16 @@ int	check_next_pos_right_y(t_data *data)
 	temp_int = (int)value;
 	temp_float = value - (double)temp_int;
 	if (look_dir_y < 0)
-	{
-		printf("facing east?\n");
 		pos_next = (int)data->pos_y + 1;
-	}
 	else
-	{
-		printf("facing west?\n");
 		pos_next = (int)data->pos_y - 1;
-	}
-	if ((int)data->pos_y == (int)value && data->map[(int)data->pos_x][pos_next] == 1)
+	if ((int)data->pos_y == (int)value && \
+data->map[(int)data->pos_x][pos_next] == 1)
 	{
-		if (pos_next > (int)data->pos_y && temp_float > 0.75)
-		{
-			printf("Denied move up to y %f\n", value);
+		if (pos_next > (int)data->pos_y && temp_float > 0.90)
 			return (0);
-		}
-		else if (pos_next < (int)data->pos_y && temp_float < 0.25)
-		{
-			printf("Denied move up to y %f\n", value);
+		else if (pos_next < (int)data->pos_y && temp_float < 0.10)
 			return (0);
-		}
 	}
 	return (1);
 }

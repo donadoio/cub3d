@@ -3,16 +3,23 @@ NAME = cub3d
 SRC =	main.c\
 		pre_map_check_a.c\
 		pre_map_check_b.c\
+		pre_map_check_c.c\
+		pre_map_check_d.c\
+		pre_map_check_e.c\
 		map_check_a.c\
 		map_check_b.c\
 		map_check_c.c\
 		map_check_d.c\
+		map_check_e.c\
+		render_next_frame_a.c\
+		render_next_frame_b.c\
+		key_pressed_a.c\
+		key_pressed_b.c\
 		structs_init.c\
 		utils_a.c\
-		console.c\
-		graphics.c\
+		utils_b.c\
 		wall_collision_a.c\
-		wall_collision_b.c
+		wall_collision_b.c\
 
 SRC_MAP = srcs/
 

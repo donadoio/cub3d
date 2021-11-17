@@ -1,13 +1,25 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        ::::::::            */
+/*   map_check_c.c                                      :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: idonado <idonado@student.codam.nl>           +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2021/11/03 18:13:23 by idonado       #+#    #+#                 */
+/*   Updated: 2021/11/03 18:13:24 by idonado       ########   odam.nl         */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <cub3d.h>
 
 static int	**cpy_map(t_data *data, int **tempmap)
 {
-	int i;
-	int j;
+	int	i;
+	int	j;
 
 	j = 0;
 	i = 0;
-	tempmap = malloc(sizeof(int*) * data->map_height);
+	tempmap = malloc(sizeof(int *) * data->map_height);
 	if (tempmap == NULL)
 		handle_temp_alloc_fail(data, tempmap, i, 0);
 	while (i < data->map_height)
@@ -37,8 +49,8 @@ static int	**set_edges_loop(t_data *data, int **tempmap, int i)
 
 static int	**set_edges(t_data *data, int **tempmap)
 {
-	int i;
-	int j;
+	int	i;
+	int	j;
 
 	i = 1;
 	j = 0;
@@ -65,8 +77,8 @@ static int	**set_edges(t_data *data, int **tempmap)
 
 static int	**fill_map(t_data *data, int **tempmap)
 {
-	int i;
-	int j;
+	int	i;
+	int	j;
 
 	i = 0;
 	j = 0;
@@ -91,9 +103,9 @@ static int	**fill_map(t_data *data, int **tempmap)
 	return (tempmap);
 }
 
-void		check_map(t_data *data)
+void	check_map(t_data *data)
 {
-	int **tempmap;
+	int	**tempmap;
 
 	tempmap = NULL;
 	tempmap = cpy_map(data, tempmap);
@@ -101,23 +113,19 @@ void		check_map(t_data *data)
 	tempmap = fill_map(data, tempmap);
 	if (tempmap[(int)data->pos_x - 1][(int)data->pos_y] == 2)
 	{
-        free_tempmap(data, tempmap);
-		exit_delete_map(data, data->map_height, 0);
+		free_temp_and_exit(data, tempmap);
 	}
 	else if (tempmap[(int)data->pos_x + 1][(int)data->pos_y] == 2)
 	{
-		free_tempmap(data, tempmap);
-		exit_delete_map(data, data->map_height, 0);
+		free_temp_and_exit(data, tempmap);
 	}
 	else if (tempmap[(int)data->pos_x][(int)data->pos_y + 1] == 2)
 	{
-		free_tempmap(data, tempmap);
-		exit_delete_map(data, data->map_height, 0);
+		free_temp_and_exit(data, tempmap);
 	}
 	else if (tempmap[(int)data->pos_x][(int)data->pos_y - 1] == 2)
 	{
-		free_tempmap(data, tempmap);
-		exit_delete_map(data, data->map_height, 0);
+		free_temp_and_exit(data, tempmap);
 	}
 	free_tempmap(data, tempmap);
 }
